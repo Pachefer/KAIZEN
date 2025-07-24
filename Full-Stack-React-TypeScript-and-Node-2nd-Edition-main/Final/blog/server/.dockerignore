@@ -1,6 +1,0 @@
-node_modules
-dbdata
-dist
-.emv
-.env.dev
-.env.example
