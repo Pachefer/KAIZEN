@@ -1,0 +1,400 @@
+# ============================================================================
+# CONFIGURACIÓN DE APLICACIÓN - NIVEL EXPERTO
+# ============================================================================
+# CARACTERÍSTICAS IMPLEMENTADAS:
+# - ✅ Configuración multi-ambiente (dev, test, prod)
+# - ✅ Configuración de base de datos con JPA/Hibernate
+# - ✅ Configuración de seguridad con Spring Security
+# - ✅ Configuración de cache con Redis
+# - ✅ Configuración de métricas con Micrometer
+# - ✅ Configuración de logging con Logback
+# - ✅ Configuración de observabilidad con OpenTelemetry
+# - ✅ Configuración de circuit breaker con Resilience4j
+# - ✅ Configuración de rate limiting
+# - ✅ Configuración de documentación API con OpenAPI
+# ============================================================================
+
+spring:
+  application:
+    name: mastering-microservices
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE BASE DE DATOS
+  # ============================================================================
+  datasource:
+    url: jdbc:postgresql://localhost:5432/microservices_db
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      leak-detection-threshold: 60000
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE JPA/HIBERNATE
+  # ============================================================================
+  jpa:
+    hibernate:
+      ddl-auto: validate
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 20
+          fetch_size: 20
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        connection:
+          provider_disables_autocommit: true
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        jcache:
+          provider: org.ehcache.jsr107.EhcacheCachingProvider
+          uri: classpath:ehcache.xml
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE CACHE
+  # ============================================================================
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000 # 1 hora
+      cache-null-values: false
+      use-key-prefix: true
+      key-prefix: "microservices:"
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE REDIS
+  # ============================================================================
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: 0
+    timeout: 2000ms
+    lettuce:
+      pool:
+        max-active: 20
+        max-idle: 10
+        min-idle: 5
+        max-wait: -1ms
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE SECURITY
+  # ============================================================================
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER_URI:http://localhost:8080/auth}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8080/auth/.well-known/jwks.json}
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE KAFKA
+  # ============================================================================
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: ${spring.application.name}-consumer
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      batch-size: 16384
+      linger-ms: 1
+      buffer-memory: 33554432
+  
+  # ============================================================================
+  # CONFIGURACIÓN DE RABBITMQ
+  # ============================================================================
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 5
+        max-concurrency: 10
+        prefetch: 1
+        default-requeue-rejected: false
+    publisher-confirm-type: correlated
+    publisher-returns: true
+
+# ============================================================================
+# CONFIGURACIÓN DEL SERVIDOR
+# ============================================================================
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /api
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: never
+    include-exception: false
+
+# ============================================================================
+# CONFIGURACIÓN DE ACTUATOR
+# ============================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,configprops,beans,mappings,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      show-components: always
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+        descriptions: true
+        step: 1m
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active:dev}
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5,0.95,0.99
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+    disk:
+      enabled: true
+    defaults:
+      enabled: true
+
+# ============================================================================
+# CONFIGURACIÓN DE LOGGING
+# ============================================================================
+logging:
+  level:
+    root: INFO
+    com.masteringmicroservices: DEBUG
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/application.log
+    max-size: 100MB
+    max-history: 30
+
+# ============================================================================
+# CONFIGURACIÓN DE RESILIENCE4J
+# ============================================================================
+resilience4j:
+  circuitbreaker:
+    instances:
+      itemService:
+        sliding-window-size: 10
+        minimum-number-of-calls: 5
+        permitted-number-of-calls-in-half-open-state: 3
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 5s
+        failure-rate-threshold: 50
+        event-consumer-buffer-size: 10
+        record-exceptions:
+          - java.io.IOException
+          - java.util.concurrent.TimeoutException
+          - java.util.concurrent.CompletionException
+  retry:
+    instances:
+      itemService:
+        max-attempts: 3
+        wait-duration: 1s
+        enable-exponential-backoff: true
+        exponential-backoff-multiplier: 2
+  ratelimiter:
+    instances:
+      itemService:
+        limit-for-period: 100
+        limit-refresh-period: 1s
+        timeout-duration: 1s
+  bulkhead:
+    instances:
+      itemService:
+        max-concurrent-calls: 20
+        max-wait-duration: 1s
+
+# ============================================================================
+# CONFIGURACIÓN DE OPENAPI/SWAGGER
+# ============================================================================
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  info:
+    title: Mastering Microservices API
+    description: API para gestión de items con funcionalidades avanzadas
+    version: 2.0.0
+    contact:
+      name: Experto en Microservicios
+      email: experto@microservices.com
+    license:
+      name: MIT License
+      url: https://opensource.org/licenses/MIT
+
+# ============================================================================
+# CONFIGURACIÓN DE CACHE
+# ============================================================================
+cache:
+  items:
+    ttl: 3600 # 1 hora
+    max-size: 1000
+  categories:
+    ttl: 7200 # 2 horas
+    max-size: 100
+
+# ============================================================================
+# CONFIGURACIÓN DE VALIDACIÓN
+# ============================================================================
+validation:
+  item:
+    name:
+      min-length: 2
+      max-length: 100
+    code:
+      min-length: 3
+      max-length: 50
+    description:
+      max-length: 1000
+    price:
+      min: 0.0
+      max: 999999.99
+    stock:
+      min: 0
+      max: 1000000
+
+# ============================================================================
+# CONFIGURACIÓN DE SEGURIDAD
+# ============================================================================
+security:
+  jwt:
+    secret: ${JWT_SECRET:your-secret-key-here-make-it-long-and-secure}
+    expiration: 86400000 # 24 horas
+    refresh-expiration: 604800000 # 7 días
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET,POST,PUT,DELETE,OPTIONS
+    allowed-headers: "*"
+    allow-credentials: true
+  rate-limit:
+    enabled: true
+    requests-per-minute: 100
+    burst-capacity: 200
+
+# ============================================================================
+# CONFIGURACIÓN DE OBSERVABILIDAD
+# ============================================================================
+opentelemetry:
+  traces:
+    exporter: jaeger
+    endpoint: ${JAEGER_ENDPOINT:http://localhost:14268/api/traces}
+  metrics:
+    exporter: prometheus
+  logs:
+    exporter: otlp
+
+# ============================================================================
+# CONFIGURACIÓN DE MONITOREO
+# ============================================================================
+monitoring:
+  health:
+    check-interval: 30s
+    timeout: 5s
+  metrics:
+    collection-interval: 1m
+    retention-period: 7d
+  alerts:
+    enabled: true
+    webhook-url: ${ALERT_WEBHOOK_URL:}
+
+# ============================================================================
+# CONFIGURACIÓN DE PERFORMANCE
+# ============================================================================
+performance:
+  async:
+    core-pool-size: 10
+    max-pool-size: 50
+    queue-capacity: 100
+    keep-alive-seconds: 60
+  database:
+    connection-pool-size: 20
+    query-timeout: 30s
+    batch-size: 100
+  cache:
+    max-size: 10000
+    eviction-policy: LRU
+
+# ============================================================================
+# CONFIGURACIÓN DE DESARROLLO
+# ============================================================================
+spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: static/**,public/**,templates/**
+    livereload:
+      enabled: true
+      port: 35729
+
+# ============================================================================
+# CONFIGURACIÓN DE TESTING
+# ============================================================================
+testing:
+  embedded:
+    database:
+      enabled: true
+      type: h2
+  mock:
+    external-services: true
+    timeout: 5s
+
+# ============================================================================
+# CONFIGURACIÓN DE DEPLOYMENT
+# ============================================================================
+deployment:
+  environment: ${ENVIRONMENT:dev}
+  version: ${APP_VERSION:2.0.0}
+  region: ${AWS_REGION:us-east-1}
+  instance-id: ${INSTANCE_ID:unknown} 

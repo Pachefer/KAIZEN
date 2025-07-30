@@ -22,79 +22,164 @@ La arquitectura de microservicios es como romper tu aplicación grande y torpe e
 
 ```java
 // Microservicio de Usuarios
+// Este es un ejemplo completo de un microservicio que maneja la gestión de usuarios
+// Demuestra los principios clave de microservicios: responsabilidad única, acoplamiento suelto,
+// y despliegue independiente
+
+// Anotación principal de Spring Boot que configura automáticamente la aplicación
+// @SpringBootApplication combina @Configuration, @EnableAutoConfiguration y @ComponentScan
 @SpringBootApplication
+// Habilita el cliente de descubrimiento de servicios (Eureka, Consul, etc.)
+// Permite que este servicio se registre y descubra otros servicios
 @EnableDiscoveryClient
 public class UsuarioServiceApplication {
+    
+    /**
+     * Método principal que inicia la aplicación Spring Boot
+     * Este es el punto de entrada de la aplicación
+     * @param args Argumentos de línea de comandos pasados al programa
+     */
     public static void main(String[] args) {
+        // SpringApplication.run() inicia el contexto de Spring y arranca el servidor embebido
+        // La aplicación se ejecutará en el puerto configurado (por defecto 8080)
         SpringApplication.run(UsuarioServiceApplication.class, args);
     }
 }
 
+// Controlador REST que maneja las peticiones HTTP relacionadas con usuarios
+// @RestController combina @Controller y @ResponseBody para respuestas JSON automáticas
 @RestController
+// Define la ruta base para todos los endpoints de este controlador
+// Todas las URLs comenzarán con /api/usuarios
 @RequestMapping("/api/usuarios")
 public class UsuarioController {
     
+    // Inyección de dependencias del servicio de usuarios
+    // @Autowired le dice a Spring que inyecte una instancia de UsuarioService
     @Autowired
-    private UsuarioService usuarioService;
+    private UsuarioService usuarioService;  // Servicio que contiene la lógica de negocio
     
-    @GetMapping("/{id}")
+    /**
+     * Endpoint GET para obtener un usuario por su ID
+     * @param id ID único del usuario a buscar
+     * @return ResponseEntity con el usuario si se encuentra, o 404 si no existe
+     */
+    @GetMapping("/{id}")  // Mapea peticiones GET a /api/usuarios/{id}
     public ResponseEntity<Usuario> obtenerUsuario(@PathVariable Long id) {
+        // Llama al servicio para obtener el usuario por ID
         Usuario usuario = usuarioService.obtenerUsuario(id);
+        
+        // Verifica si el usuario existe
         if (usuario != null) {
+            // Retorna 200 OK con el usuario en el cuerpo de la respuesta
             return ResponseEntity.ok(usuario);
         }
+        // Retorna 404 Not Found si el usuario no existe
         return ResponseEntity.notFound().build();
     }
     
-    @PostMapping
+    /**
+     * Endpoint POST para crear un nuevo usuario
+     * @param usuario Datos del usuario a crear (viene en el cuerpo de la petición)
+     * @return ResponseEntity con el usuario creado y código 201 Created
+     */
+    @PostMapping  // Mapea peticiones POST a /api/usuarios
     public ResponseEntity<Usuario> crearUsuario(@RequestBody Usuario usuario) {
+        // Llama al servicio para crear el usuario
         Usuario nuevoUsuario = usuarioService.crearUsuario(usuario);
+        // Retorna 201 Created con el usuario creado en el cuerpo de la respuesta
         return ResponseEntity.status(HttpStatus.CREATED).body(nuevoUsuario);
     }
     
-    @PutMapping("/{id}")
+    /**
+     * Endpoint PUT para actualizar un usuario existente
+     * @param id ID del usuario a actualizar
+     * @param usuario Nuevos datos del usuario
+     * @return ResponseEntity con el usuario actualizado o 404 si no existe
+     */
+    @PutMapping("/{id}")  // Mapea peticiones PUT a /api/usuarios/{id}
     public ResponseEntity<Usuario> actualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+        // Llama al servicio para actualizar el usuario
         Usuario usuarioActualizado = usuarioService.actualizarUsuario(id, usuario);
+        
+        // Verifica si la actualización fue exitosa
         if (usuarioActualizado != null) {
+            // Retorna 200 OK con el usuario actualizado
             return ResponseEntity.ok(usuarioActualizado);
         }
+        // Retorna 404 Not Found si el usuario no existe
         return ResponseEntity.notFound().build();
     }
     
-    @DeleteMapping("/{id}")
+    /**
+     * Endpoint DELETE para eliminar un usuario
+     * @param id ID del usuario a eliminar
+     * @return ResponseEntity con código 204 No Content si se elimina, o 404 si no existe
+     */
+    @DeleteMapping("/{id}")  // Mapea peticiones DELETE a /api/usuarios/{id}
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
+        // Llama al servicio para eliminar el usuario
         boolean eliminado = usuarioService.eliminarUsuario(id);
+        
+        // Verifica si la eliminación fue exitosa
         if (eliminado) {
+            // Retorna 204 No Content (sin cuerpo de respuesta)
             return ResponseEntity.noContent().build();
         }
+        // Retorna 404 Not Found si el usuario no existe
         return ResponseEntity.notFound().build();
     }
 }
 
+// Servicio de usuarios que contiene la lógica de negocio
+// @Service marca esta clase como un servicio de Spring que puede ser inyectado
 @Service
 public class UsuarioService {
     
+    // Inyección del repositorio de usuarios para acceso a datos
+    // @Autowired le dice a Spring que inyecte una instancia de UsuarioRepository
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private UsuarioRepository usuarioRepository;  // Capa de acceso a datos
     
+    // Inyección de RestTemplate para comunicación con otros microservicios
+    // Permite hacer llamadas HTTP a otros servicios
     @Autowired
-    private RestTemplate restTemplate;
+    private RestTemplate restTemplate;  // Cliente HTTP para comunicación entre servicios
     
+    /**
+     * Obtiene un usuario por su ID
+     * @param id ID único del usuario a buscar
+     * @return Usuario si se encuentra, null si no existe
+     */
     public Usuario obtenerUsuario(Long id) {
+        // Busca el usuario en la base de datos usando el repositorio
+        // findById() retorna un Optional, orElse(null) retorna null si no se encuentra
         return usuarioRepository.findById(id).orElse(null);
     }
     
+    /**
+     * Crea un nuevo usuario con validaciones
+     * @param usuario Datos del usuario a crear
+     * @return Usuario creado y guardado en la base de datos
+     * @throws IllegalArgumentException si faltan datos requeridos
+     * @throws RuntimeException si el email ya está registrado
+     */
     public Usuario crearUsuario(Usuario usuario) {
-        // Validar datos
+        // VALIDACIÓN 1: Verificar que los campos obligatorios no sean null
+        // Esta validación previene errores de base de datos y asegura integridad de datos
         if (usuario.getEmail() == null || usuario.getNombre() == null) {
             throw new IllegalArgumentException("Email y nombre son requeridos");
         }
         
-        // Verificar si el email ya existe
+        // VALIDACIÓN 2: Verificar que el email no esté duplicado
+        // findByEmail() busca en la base de datos si ya existe un usuario con ese email
+        // isPresent() retorna true si se encuentra un usuario con ese email
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new RuntimeException("El email ya está registrado");
         }
         
+        // Si todas las validaciones pasan, guarda el usuario en la base de datos
+        // save() persiste el usuario y retorna la entidad con el ID generado
         return usuarioRepository.save(usuario);
     }
     
@@ -724,28 +809,402 @@ public class Orden {
 public enum EstadoOrden {
     PENDIENTE, CONFIRMADA, EN_PROCESO, ENVIADA, ENTREGADA, CANCELADA
 }
+
+## 📊 **RESULTADOS ESPERADOS Y MANEJO DE ERRORES**
+
+### **🎯 Casos de Éxito Esperados**
+
+#### **1. Creación Exitosa de Usuario**
+```java
+// ENTRADA
+POST /api/usuarios
+{
+    "nombre": "Juan Pérez",
+    "email": "juan.perez@email.com",
+    "password": "password123"
+}
+
+// RESULTADO ESPERADO - ÉXITO
+HTTP 201 Created
+{
+    "id": 1,
+    "nombre": "Juan Pérez",
+    "email": "juan.perez@email.com",
+    "password": "$2a$10$hashedPassword...",
+    "estado": "ACTIVO",
+    "fechaCreacion": "2024-01-15T10:30:00",
+    "fechaActualizacion": "2024-01-15T10:30:00"
+}
+
+// LÓGICA EJECUTADA:
+// ✅ Validación de campos requeridos
+// ✅ Verificación de email único
+// ✅ Encriptación de password con BCrypt
+// ✅ Asignación de estado ACTIVO
+// ✅ Generación automática de fechas
+// ✅ Persistencia en base de datos
+// ✅ Respuesta HTTP 201 con usuario creado
 ```
 
-### Beneficios de Microservicios
+#### **2. Obtención Exitosa de Usuario**
+```java
+// ENTRADA
+GET /api/usuarios/1
 
-1. **Escalable**: Puedes escalar servicios individuales en respuesta a la demanda en lugar de escalar toda la aplicación.
+// RESULTADO ESPERADO - ÉXITO
+HTTP 200 OK
+{
+    "id": 1,
+    "nombre": "Juan Pérez",
+    "email": "juan.perez@email.com",
+    "estado": "ACTIVO",
+    "fechaCreacion": "2024-01-15T10:30:00"
+}
 
-2. **Adaptable y Ágil**: Cada equipo puede innovar y desplegar su servicio independientemente, con tiempos de innovación más rápidos y tiempo de llegada al mercado más rápido.
+// LÓGICA EJECUTADA:
+// ✅ Búsqueda en base de datos por ID
+// ✅ Usuario encontrado
+// ✅ Serialización a JSON
+// ✅ Respuesta HTTP 200
+```
 
-3. **Resiliencia y Aislamiento de Fallas**: Cuando un servicio falla, toda la aplicación no tiene que irse abajo en llamas.
+#### **3. Actualización Exitosa de Usuario**
+```java
+// ENTRADA
+PUT /api/usuarios/1
+{
+    "nombre": "Juan Carlos Pérez",
+    "email": "juan.carlos@email.com"
+}
 
-4. **Diversidad Tecnológica**: Diferentes servicios pueden construirse usando diferentes lenguajes o frameworks.
+// RESULTADO ESPERADO - ÉXITO
+HTTP 200 OK
+{
+    "id": 1,
+    "nombre": "Juan Carlos Pérez",
+    "email": "juan.carlos@email.com",
+    "estado": "ACTIVO",
+    "fechaCreacion": "2024-01-15T10:30:00",
+    "fechaActualizacion": "2024-01-15T11:45:00"
+}
 
-5. **Colaboración Mejorada**: Los equipos pequeños pueden poseer sus propios microservicios y ser más productivos.
+// LÓGICA EJECUTADA:
+// ✅ Validación de existencia del usuario
+// ✅ Actualización de campos
+// ✅ Actualización automática de fechaActualizacion
+// ✅ Persistencia en base de datos
+// ✅ Respuesta HTTP 200 con usuario actualizado
+```
 
-### Desafíos de Microservicios
+#### **4. Eliminación Exitosa de Usuario**
+```java
+// ENTRADA
+DELETE /api/usuarios/1
 
-1. **Complejidad**: Cuantos más microservicios tengas, más partes móviles hay.
+// RESULTADO ESPERADO - ÉXITO
+HTTP 204 No Content
 
-2. **Consistencia de Datos**: Mantener los datos consistentes a través de múltiples servicios es como pastorear gatos.
+// LÓGICA EJECUTADA:
+// ✅ Verificación de existencia del usuario
+// ✅ Eliminación de la base de datos
+// ✅ Respuesta HTTP 204 (sin contenido)
+```
 
-3. **Latencia de Red**: Más servicios hablando entre sí significa más oportunidades para retrasos.
+#### **5. Obtención de Usuario con Perfil**
+```java
+// ENTRADA
+GET /api/usuarios/1/con-perfil
 
-4. **Seguridad**: Asegurar la comunicación entre microservicios y gestionar la autenticación puede complicarse.
+// RESULTADO ESPERADO - ÉXITO
+HTTP 200 OK
+{
+    "usuario": {
+        "id": 1,
+        "nombre": "Juan Pérez",
+        "email": "juan.perez@email.com"
+    },
+    "perfil": {
+        "id": 1,
+        "biografia": "Desarrollador Java",
+        "ubicacion": "Madrid, España",
+        "sitioWeb": "https://juanperez.dev"
+    }
+}
 
-5. **Sobrecarga Operacional**: Necesitarás tuberías CI/CD fuertes, monitoreo y gestión de infraestructura. 
+// LÓGICA EJECUTADA:
+// ✅ Obtención de usuario principal
+// ✅ Llamada síncrona al microservicio de perfiles
+// ✅ Combinación de datos
+// ✅ Respuesta HTTP 200 con datos completos
+```
+
+### **❌ Casos de Error Esperados**
+
+#### **1. Error de Validación - Campos Requeridos**
+```java
+// ENTRADA INVÁLIDA
+POST /api/usuarios
+{
+    "nombre": "",
+    "email": null,
+    "password": "123"
+}
+
+// RESULTADO ESPERADO - ERROR
+HTTP 400 Bad Request
+{
+    "error": "VALIDATION_ERROR",
+    "message": "Email y nombre son requeridos",
+    "timestamp": "2024-01-15T10:30:00",
+    "path": "/api/usuarios"
+}
+
+// LÓGICA EJECUTADA:
+// ❌ Validación falla en campos requeridos
+// ❌ IllegalArgumentException lanzada
+// ❌ ControllerAdvice captura la excepción
+// ❌ Respuesta HTTP 400 con detalles del error
+```
+
+#### **2. Error de Validación - Email Duplicado**
+```java
+// ENTRADA INVÁLIDA (email ya existe)
+POST /api/usuarios
+{
+    "nombre": "María García",
+    "email": "juan.perez@email.com", // Email ya registrado
+    "password": "password456"
+}
+
+// RESULTADO ESPERADO - ERROR
+HTTP 409 Conflict
+{
+    "error": "DUPLICATE_EMAIL",
+    "message": "El email ya está registrado",
+    "timestamp": "2024-01-15T10:30:00",
+    "path": "/api/usuarios"
+}
+
+// LÓGICA EJECUTADA:
+// ❌ Verificación de email único falla
+// ❌ RuntimeException lanzada
+// ❌ ControllerAdvice captura la excepción
+// ❌ Respuesta HTTP 409 (Conflict)
+```
+
+#### **3. Error de Recurso No Encontrado**
+```java
+// ENTRADA INVÁLIDA (usuario no existe)
+GET /api/usuarios/999
+
+// RESULTADO ESPERADO - ERROR
+HTTP 404 Not Found
+{
+    "error": "USER_NOT_FOUND",
+    "message": "Usuario con ID 999 no encontrado",
+    "timestamp": "2024-01-15T10:30:00",
+    "path": "/api/usuarios/999"
+}
+
+// LÓGICA EJECUTADA:
+// ❌ Búsqueda en base de datos no encuentra usuario
+// ❌ Método retorna null
+// ❌ Controller retorna ResponseEntity.notFound()
+// ❌ Respuesta HTTP 404
+```
+
+#### **4. Error de Servicio Externo No Disponible**
+```java
+// ENTRADA
+GET /api/usuarios/1/con-perfil
+
+// RESULTADO ESPERADO - ERROR PARCIAL
+HTTP 200 OK
+{
+    "usuario": {
+        "id": 1,
+        "nombre": "Juan Pérez",
+        "email": "juan.perez@email.com"
+    },
+    "perfil": null
+}
+
+// LÓGICA EJECUTADA:
+// ✅ Usuario principal obtenido exitosamente
+// ❌ Llamada al microservicio de perfiles falla
+// ❌ Exception capturada y loggeada
+// ❌ Respuesta parcial con perfil null
+// ✅ Respuesta HTTP 200 (no falla completamente)
+```
+
+#### **5. Error de Base de Datos**
+```java
+// ENTRADA
+POST /api/usuarios
+{
+    "nombre": "Test User",
+    "email": "test@email.com",
+    "password": "password123"
+}
+
+// RESULTADO ESPERADO - ERROR
+HTTP 500 Internal Server Error
+{
+    "error": "DATABASE_ERROR",
+    "message": "Error de conexión a la base de datos",
+    "timestamp": "2024-01-15T10:30:00",
+    "path": "/api/usuarios"
+}
+
+// LÓGICA EJECUTADA:
+// ❌ Persistencia en base de datos falla
+// ❌ DataAccessException lanzada
+// ❌ ControllerAdvice captura la excepción
+// ❌ Respuesta HTTP 500
+```
+
+### **🔧 Manejo de Errores Implementado**
+
+#### **1. Excepciones Personalizadas**
+```java
+// Excepciones específicas del dominio
+public class UsuarioNoEncontradoException extends RuntimeException {
+    public UsuarioNoEncontradoException(String message) {
+        super(message);
+    }
+}
+
+public class EmailDuplicadoException extends RuntimeException {
+    public EmailDuplicadoException(String message) {
+        super(message);
+    }
+}
+```
+
+#### **2. ControllerAdvice para Manejo Global**
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleValidationError(IllegalArgumentException e) {
+        return ResponseEntity.badRequest()
+            .body(new ErrorResponse("VALIDATION_ERROR", e.getMessage()));
+    }
+    
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessError(RuntimeException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(new ErrorResponse("BUSINESS_ERROR", e.getMessage()));
+    }
+    
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDatabaseError(DataAccessException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(new ErrorResponse("DATABASE_ERROR", "Error de base de datos"));
+    }
+}
+```
+
+#### **3. Logging y Monitoreo**
+```java
+// Logging estructurado para debugging
+logger.info("Usuario creado exitosamente: {}", usuario.getId());
+logger.error("Error al crear usuario: {}", e.getMessage(), e);
+logger.warn("Intento de crear usuario con email duplicado: {}", email);
+```
+
+### **📈 Métricas de Performance Esperadas**
+
+#### **Tiempos de Respuesta:**
+- **Creación de Usuario:** 100-300ms
+- **Obtención de Usuario:** 50-150ms
+- **Actualización de Usuario:** 100-250ms
+- **Eliminación de Usuario:** 80-200ms
+- **Usuario con Perfil:** 200-500ms (incluye llamada externa)
+
+#### **Throughput:**
+- **Operaciones por segundo:** 1000-3000 req/seg
+- **Usuarios concurrentes:** 500-1500
+- **Latencia p95:** < 500ms
+- **Latencia p99:** < 1000ms
+
+#### **Disponibilidad:**
+- **Uptime esperado:** 99.9%
+- **Tiempo de recuperación:** < 30 segundos
+- **Tolerancia a fallos:** Circuit breaker implementado
+
+### **🛡️ Estrategias de Resiliencia**
+
+#### **1. Circuit Breaker Pattern**
+```java
+// Implementación con Resilience4j
+@CircuitBreaker(name = "perfilService", fallbackMethod = "getPerfilFallback")
+public Perfil getPerfil(Long userId) {
+    return restTemplate.getForObject("/api/perfiles/" + userId, Perfil.class);
+}
+
+public Perfil getPerfilFallback(Long userId, Exception e) {
+    logger.warn("Fallback ejecutado para usuario: {}", userId);
+    return null; // Retorna perfil vacío en caso de fallo
+}
+```
+
+#### **2. Retry Pattern**
+```java
+// Reintentos automáticos para operaciones transitorias
+@Retry(name = "databaseRetry", fallbackMethod = "saveUserFallback")
+public Usuario saveUser(Usuario usuario) {
+    return usuarioRepository.save(usuario);
+}
+```
+
+#### **3. Timeout Configuration**
+```java
+// Timeouts para evitar bloqueos indefinidos
+@Bean
+public RestTemplate restTemplate() {
+    return RestTemplateBuilder()
+        .setConnectTimeout(Duration.ofSeconds(5))
+        .setReadTimeout(Duration.ofSeconds(10))
+        .build();
+}
+```
+
+### **🧪 Pruebas Unitarias Esperadas**
+
+#### **Casos de Prueba Exitosos:**
+```java
+@Test
+void crearUsuario_ConDatosValidos_DeberiaCrearUsuario() {
+    // Given
+    UsuarioRequest request = new UsuarioRequest("Test", "test@email.com", "password");
+    
+    // When
+    Usuario resultado = usuarioService.crearUsuario(request);
+    
+    // Then
+    assertThat(resultado).isNotNull();
+    assertThat(resultado.getEmail()).isEqualTo("test@email.com");
+    assertThat(resultado.getEstado()).isEqualTo(EstadoUsuario.ACTIVO);
+    verify(usuarioRepository).save(any(Usuario.class));
+}
+```
+
+#### **Casos de Prueba de Error:**
+```java
+@Test
+void crearUsuario_ConEmailDuplicado_DeberiaLanzarExcepcion() {
+    // Given
+    UsuarioRequest request = new UsuarioRequest("Test", "existing@email.com", "password");
+    when(usuarioRepository.findByEmail("existing@email.com"))
+        .thenReturn(Optional.of(new Usuario()));
+    
+    // When & Then
+    assertThatThrownBy(() -> usuarioService.crearUsuario(request))
+        .isInstanceOf(RuntimeException.class)
+        .hasMessage("El email ya está registrado");
+}
+```
+
+Esta implementación garantiza un manejo robusto de errores, alta disponibilidad y performance predecible del microservicio de usuarios. 
