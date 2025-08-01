@@ -1,0 +1,59 @@
+{
+  "name": "typescript-interview-guide-espanol",
+  "version": "1.0.0",
+  "description": "Guía completa de entrevistas TypeScript en español con ejemplos de código y pruebas unitarias",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "test:ui": "vitest --ui",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write src/**/*.ts",
+    "setup": "npm install && npm run build",
+    "dev": "vitest --watch --reporter=verbose",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean"
+  },
+  "keywords": [
+    "typescript",
+    "interview",
+    "questions",
+    "español",
+    "spanish",
+    "guía",
+    "tutorial",
+    "ejemplos",
+    "pruebas",
+    "unitarias"
+  ],
+  "author": "Guía de Entrevistas TypeScript",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "@vitest/coverage-v8": "^1.0.4",
+    "@vitest/ui": "^1.0.4",
+    "eslint": "^8.56.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/example/typescript-interview-guide-espanol.git"
+  },
+  "bugs": {
+    "url": "https://github.com/example/typescript-interview-guide-espanol/issues"
+  },
+  "homepage": "https://github.com/example/typescript-interview-guide-espanol#readme"
+} 

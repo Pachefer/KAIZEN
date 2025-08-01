@@ -1,0 +1,72 @@
+{
+  "name": "nodejs-ejemplos-practicos",
+  "version": "1.0.0",
+  "description": "Ejemplos prácticos de Node.js con pruebas unitarias y mejoras",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "example:callback": "node ejemplos/01-callbacks.js",
+    "example:promise": "node ejemplos/02-promises.js",
+    "example:eventloop": "node ejemplos/03-event-loop.js",
+    "example:http": "node ejemplos/04-http-server.js",
+    "example:errors": "node ejemplos/05-error-handling.js",
+    "example:streams": "node ejemplos/06-streams.js",
+    "example:jwt": "node ejemplos/07-jwt-auth.js",
+    "example:performance": "node ejemplos/08-performance.js",
+    "example:testing": "npm test",
+    "example:deployment": "node ejemplos/10-deployment.js"
+  },
+  "keywords": [
+    "nodejs",
+    "javascript",
+    "ejemplos",
+    "practicos",
+    "testing",
+    "express",
+    "jwt",
+    "streams",
+    "performance"
+  ],
+  "author": "Guía Node.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "compression": "^1.7.4",
+    "ioredis": "^5.3.2",
+    "winston": "^3.11.0",
+    "joi": "^17.11.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.2",
+    "eslint": "^8.55.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guia-nodejs/ejemplos-practicos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guia-nodejs/ejemplos-practicos/issues"
+  },
+  "homepage": "https://github.com/guia-nodejs/ejemplos-practicos#readme"
+} 
