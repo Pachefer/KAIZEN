@@ -1,0 +1,80 @@
+{
+  "name": "mongodb-ejemplos-practicos",
+  "version": "1.0.0",
+  "description": "Ejemplos prácticos de MongoDB con pruebas unitarias y mejoras",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "example:basic": "node ejemplos/01-basico.js",
+    "example:aggregation": "node ejemplos/02-agregacion.js",
+    "example:indexes": "node ejemplos/03-indices.js",
+    "example:replication": "node ejemplos/04-replicacion.js",
+    "example:sharding": "node ejemplos/05-sharding.js",
+    "example:transactions": "node ejemplos/06-transacciones.js",
+    "example:auth": "node ejemplos/07-autenticacion.js",
+    "example:backup": "node ejemplos/08-backup.js",
+    "example:monitoring": "node ejemplos/09-monitoreo.js",
+    "example:performance": "node ejemplos/10-rendimiento.js"
+  },
+  "keywords": [
+    "mongodb",
+    "nosql",
+    "database",
+    "ejemplos",
+    "practicos",
+    "testing",
+    "aggregation",
+    "indexes",
+    "replication",
+    "sharding",
+    "transactions",
+    "authentication",
+    "backup",
+    "monitoring",
+    "performance"
+  ],
+  "author": "Guía MongoDB",
+  "license": "MIT",
+  "dependencies": {
+    "mongodb": "^5.7.0",
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0",
+    "joi": "^17.11.0",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "compression": "^1.7.4",
+    "rate-limiter-flexible": "^3.0.8",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^9.1.3",
+    "supertest": "^6.3.3",
+    "nodemon": "^3.0.2",
+    "eslint": "^8.55.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/guia-mongodb/ejemplos-practicos.git"
+  },
+  "bugs": {
+    "url": "https://github.com/guia-mongodb/ejemplos-practicos/issues"
+  },
+  "homepage": "https://github.com/guia-mongodb/ejemplos-practicos#readme"
+} 
