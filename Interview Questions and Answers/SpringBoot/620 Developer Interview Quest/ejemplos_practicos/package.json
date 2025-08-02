@@ -9,6 +9,10 @@
     "test:coverage": "jest --coverage",
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "start:basic": "node ejemplos/01-spring-boot-basico.js",
+    "dev:basic": "nodemon ejemplos/01-spring-boot-basico.js",
+    "start:security": "node ejemplos/02-spring-security.js",
+    "dev:security": "nodemon ejemplos/02-spring-security.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
@@ -23,14 +27,15 @@
   "author": "Spring Boot Study Guide",
   "license": "MIT",
   "devDependencies": {
+    "eslint": "^8.55.0",
     "jest": "^29.7.0",
-    "nodemon": "^3.0.2",
-    "eslint": "^8.55.0"
+    "nodemon": "^3.0.2"
   },
   "dependencies": {
-    "express": "^4.18.2",
     "cors": "^2.8.5",
-    "helmet": "^7.1.0"
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "jest": {
     "testEnvironment": "node",
@@ -44,4 +49,4 @@
       "html"
     ]
   }
-} 
+}

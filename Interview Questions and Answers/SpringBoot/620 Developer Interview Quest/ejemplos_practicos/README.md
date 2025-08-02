@@ -12,20 +12,10 @@ ejemplos_practicos/
 ├── README.md                 # Este archivo
 ├── ejemplos/                 # Ejemplos de código
 │   ├── 01-spring-boot-basico.js
-│   ├── 02-spring-core.js
-│   ├── 03-spring-data.js
-│   ├── 04-spring-security.js
-│   ├── 05-spring-web.js
-│   ├── 06-testing.js
-│   └── 07-deployment.js
+│   └── 02-spring-security.js
 └── __tests__/               # Pruebas unitarias
     ├── 01-spring-boot-basico.test.js
-    ├── 02-spring-core.test.js
-    ├── 03-spring-data.test.js
-    ├── 04-spring-security.test.js
-    ├── 05-spring-web.test.js
-    ├── 06-testing.test.js
-    └── 07-deployment.test.js
+    └── 02-spring-security.test.js
 ```
 
 ## 🚀 Instalación
@@ -46,13 +36,14 @@ ejemplos_practicos/
 
 ```bash
 # Ejemplo básico de Spring Boot
+npm run start:basic
+# o
 node ejemplos/01-spring-boot-basico.js
 
-# Ejemplo de Spring Core
-node ejemplos/02-spring-core.js
-
-# Ejemplo de Spring Data
-node ejemplos/03-spring-data.js
+# Ejemplo de Spring Security
+npm run start:security
+# o
+node ejemplos/02-spring-security.js
 ```
 
 ### Ejecutar Pruebas
@@ -75,6 +66,10 @@ npm test -- 01-spring-boot-basico.test.js
 
 - `npm start` - Ejecuta el servidor principal
 - `npm run dev` - Ejecuta en modo desarrollo con nodemon
+- `npm run start:basic` - Ejecuta ejemplo básico de Spring Boot
+- `npm run dev:basic` - Ejecuta ejemplo básico en modo desarrollo
+- `npm run start:security` - Ejecuta ejemplo de Spring Security
+- `npm run dev:security` - Ejecuta ejemplo de seguridad en modo desarrollo
 - `npm test` - Ejecuta todas las pruebas
 - `npm run lint` - Verifica el código con ESLint
 - `npm run lint:fix` - Corrige problemas de linting automáticamente
@@ -85,36 +80,21 @@ npm test -- 01-spring-boot-basico.test.js
 - Configuración básica de Spring Boot
 - Anotaciones principales
 - Configuración de propiedades
+- Endpoints equivalentes a Spring Boot
+- Manejo de errores global
+- Ciclo de vida de la aplicación
 
-### 2. Spring Core (`02-spring-core.js`)
-- Inyección de dependencias
-- Configuración de beans
-- Ciclo de vida de beans
-
-### 3. Spring Data (`03-spring-data.js`)
-- Entidades JPA
-- Repositorios Spring Data
-- Consultas personalizadas
-
-### 4. Spring Security (`04-spring-security.js`)
-- Configuración de seguridad
-- Autenticación y autorización
-- JWT tokens
-
-### 5. Spring Web (`05-spring-web.js`)
-- Controladores REST
-- Manejo de requests/responses
-- Validación de datos
-
-### 6. Testing (`06-testing.js`)
-- Pruebas unitarias con JUnit
-- Pruebas de integración
-- Mocks y stubs
-
-### 7. Deployment (`07-deployment.js`)
-- Configuración Docker
-- Docker Compose
-- Configuración de producción
+### 2. Spring Security (`02-spring-security.js`)
+- Configuración de Spring Security
+- Autenticación con JWT tokens
+- Autorización basada en roles
+- Middleware de seguridad
+- Rate limiting
+- Headers de seguridad
+- Logging de seguridad
+- Lista negra de tokens
+- Validación de entrada
+- Manejo de usuarios deshabilitados
 
 ## 🧪 Pruebas Unitarias
 
