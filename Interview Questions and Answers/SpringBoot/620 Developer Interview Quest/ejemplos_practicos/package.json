@@ -1,0 +1,47 @@
+{
+  "name": "springboot-ejemplos-practicos",
+  "version": "1.0.0",
+  "description": "Ejemplos prácticos de Spring Boot con pruebas unitarias",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "keywords": [
+    "spring-boot",
+    "java",
+    "spring",
+    "jpa",
+    "testing",
+    "examples"
+  ],
+  "author": "Spring Boot Study Guide",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.2",
+    "eslint": "^8.55.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "collectCoverageFrom": [
+      "ejemplos/**/*.js",
+      "!**/node_modules/**"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
+  }
+} 

@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "source": "620 Spring Boot Developer Interview Questions - Manish Salunke",
+    "processed_questions": 3,
+    "categories": ["Spring Boot", "Spring Core", "Spring Data"]
+  },
+  "questions": [
+    {
+      "id": 1,
+      "original_question": "What is Spring Boot?",
+      "translated_question": "¿Qué es Spring Boot?",
+      "original_answer": "Spring Boot is a framework that simplifies the development of Spring applications.",
+      "translated_answer": "Spring Boot es un framework que simplifica el desarrollo de aplicaciones Spring.",
+      "category": "Spring Boot",
+      "difficulty": "Intermediate",
+      "code_example": "```java\n@SpringBootApplication\npublic class MyApplication {\n    public static void main(String[] args) {\n        SpringApplication.run(MyApplication.class, args);\n    }\n}\n\n@RestController\npublic class ConfigController {\n    @Value(\"${app.name}\")\n    private String appName;\n    \n    @GetMapping(\"/config\")\n    public String getConfig() {\n        return \"Aplicación: \" + appName;\n    }\n}\n\n# application.properties\napp.name=Mi Aplicación Spring Boot\nserver.port=8080\n```",
+      "code_explanation": "Ejemplo práctico de Spring Boot que demuestra los conceptos mencionados en la pregunta.",
+      "unit_tests": "```java\n@WebMvcTest(ConfigController.class)\nclass ConfigControllerTest {\n    \n    @Autowired\n    private MockMvc mockMvc;\n    \n    @TestConfiguration\n    static class TestConfig {\n        @Bean\n        public ConfigController configController() {\n            return new ConfigController();\n        }\n    }\n    \n    @Test\n    void getConfig_ReturnsApplicationName() throws Exception {\n        mockMvc.perform(get(\"/config\"))\n            .andExpect(status().isOk())\n            .andExpect(content().string(containsString(\"Mi Aplicación\")));\n    }\n}\n```",
+      "test_explanation": "Pruebas unitarias para el ejemplo de Spring Boot que verifican el comportamiento esperado.",
+      "improvements": [
+        "Usar @ConfigurationProperties para configuraciones tipadas",
+        "Implementar health checks personalizados con @Component",
+        "Configurar múltiples profiles para diferentes entornos",
+        "Usar Spring Boot Actuator para monitoreo",
+        "Implementar custom starters para reutilización"
+      ],
+      "expected_result": "Código ejecutable que demuestra el concepto de Spring Boot",
+      "learning_objectives": [
+        "Comprender el concepto de Spring Boot",
+        "Aplicar patrones de diseño",
+        "Implementar pruebas unitarias",
+        "Seguir mejores prácticas"
+      ]
+    },
+    {
+      "id": 2,
+      "original_question": "What is dependency injection?",
+      "translated_question": "¿Qué es la inyección de dependencias?",
+      "original_answer": "Dependency injection is a design pattern where dependencies are provided to a class rather than created inside it.",
+      "translated_answer": "La inyección de dependencias es un patrón de diseño donde las dependencias se proporcionan a una clase en lugar de crearse dentro de ella.",
+      "category": "Spring Core",
+      "difficulty": "Intermediate",
+      "code_example": "```java\n@Component\npublic class UserService {\n    private final UserRepository userRepository;\n    \n    @Autowired\n    public UserService(UserRepository userRepository) {\n        this.userRepository = userRepository;\n    }\n    \n    public User findById(Long id) {\n        return userRepository.findById(id)\n            .orElseThrow(() -> new UserNotFoundException(\"Usuario no encontrado\"));\n    }\n}\n\n@Configuration\npublic class AppConfig {\n    @Bean\n    public UserRepository userRepository() {\n        return new JpaUserRepository();\n    }\n}\n```",
+      "code_explanation": "Ejemplo práctico de Spring Core que demuestra los conceptos mencionados en la pregunta.",
+      "unit_tests": "```java\n@ExtendWith(MockitoExtension.class)\nclass UserServiceTest {\n    \n    @Mock\n    private UserRepository userRepository;\n    \n    @InjectMocks\n    private UserService userService;\n    \n    @Test\n    void constructorInjection_WorksCorrectly() {\n        assertThat(userService).isNotNull();\n        assertThat(userService.getUserRepository()).isEqualTo(userRepository);\n    }\n    \n    @Test\n    void findById_WithValidId_ReturnsUser() {\n        Long id = 1L;\n        User expectedUser = new User(id, \"test@example.com\", \"Test User\");\n        when(userRepository.findById(id)).thenReturn(Optional.of(expectedUser));\n        \n        User result = userService.findById(id);\n        \n        assertThat(result).isEqualTo(expectedUser);\n    }\n}\n```",
+      "test_explanation": "Pruebas unitarias para el ejemplo de Spring Core que verifican el comportamiento esperado.",
+      "improvements": [
+        "Usar constructor injection en lugar de field injection para mejor testabilidad",
+        "Implementar interfaces para desacoplar componentes",
+        "Usar @Qualifier cuando hay múltiples beans del mismo tipo",
+        "Configurar beans con @ConditionalOnProperty para configuración condicional",
+        "Implementar ApplicationListener para eventos personalizados"
+      ],
+      "expected_result": "Código ejecutable que demuestra el concepto de Spring Boot",
+      "learning_objectives": [
+        "Comprender el concepto de Spring Boot",
+        "Aplicar patrones de diseño",
+        "Implementar pruebas unitarias",
+        "Seguir mejores prácticas"
+      ]
+    },
+    {
+      "id": 3,
+      "original_question": "What is JPA?",
+      "translated_question": "¿Qué es JPA?",
+      "original_answer": "JPA (Java Persistence API) is a specification for managing relational data in Java applications.",
+      "translated_answer": "JPA (Java Persistence API) es una especificación para gestionar datos relacionales en aplicaciones Java.",
+      "category": "Spring Data",
+      "difficulty": "Intermediate",
+      "code_example": "```java\n@Entity\n@Table(name = \"users\")\npublic class User {\n    @Id\n    @GeneratedValue(strategy = GenerationType.IDENTITY)\n    private Long id;\n    \n    @Column(nullable = false, unique = true)\n    private String email;\n    \n    @Column(nullable = false)\n    private String name;\n    \n    // Getters y setters\n}\n\n@Repository\npublic interface UserRepository extends JpaRepository<User, Long> {\n    Optional<User> findByEmail(String email);\n    List<User> findByNameContainingIgnoreCase(String name);\n    \n    @Query(\"SELECT u FROM User u WHERE u.email LIKE %:domain\")\n    List<User> findByEmailDomain(@Param(\"domain\") String domain);\n}\n```",
+      "code_explanation": "Ejemplo práctico de Spring Data que demuestra los conceptos mencionados en la pregunta.",
+      "unit_tests": "```java\n@DataJpaTest\nclass UserRepositoryTest {\n    \n    @Autowired\n    private UserRepository userRepository;\n    \n    @Autowired\n    private TestEntityManager entityManager;\n    \n    @Test\n    void findByEmail_WithExistingEmail_ReturnsUser() {\n        User user = new User(null, \"test@example.com\", \"Test User\");\n        entityManager.persistAndFlush(user);\n        \n        Optional<User> found = userRepository.findByEmail(\"test@example.com\");\n        \n        assertThat(found).isPresent();\n        assertThat(found.get().getEmail()).isEqualTo(\"test@example.com\");\n    }\n    \n    @Test\n    void findByEmail_WithNonExistingEmail_ReturnsEmpty() {\n        Optional<User> found = userRepository.findByEmail(\"nonexistent@example.com\");\n        \n        assertThat(found).isEmpty();\n    }\n}\n```",
+      "test_explanation": "Pruebas unitarias para el ejemplo de Spring Data que verifican el comportamiento esperado.",
+      "improvements": [
+        "Usar @Query con índices optimizados",
+        "Implementar paginación para consultas grandes",
+        "Usar @EntityGraph para evitar N+1 queries",
+        "Implementar auditoría con @EntityListeners",
+        "Usar @Lock para control de concurrencia"
+      ],
+      "expected_result": "Código ejecutable que demuestra el concepto de Spring Boot",
+      "learning_objectives": [
+        "Comprender el concepto de Spring Boot",
+        "Aplicar patrones de diseño",
+        "Implementar pruebas unitarias",
+        "Seguir mejores prácticas"
+      ]
+    }
+  ]
+}
