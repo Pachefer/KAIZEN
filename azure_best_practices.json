@@ -1,0 +1,192 @@
+{
+  "titulo": "Guía de Mejores Prácticas Azure - Patrones y Optimizaciones",
+  "descripcion": "Guía completa de mejores prácticas, patrones de arquitectura y optimizaciones para Azure",
+  "patrones_arquitectura": {
+    "microservicios": {
+      "descripcion": "Arquitectura de microservicios con Azure",
+      "componentes": [
+        "Azure Kubernetes Service (AKS)",
+        "Azure Container Registry",
+        "Azure Service Bus",
+        "Azure API Management"
+      ],
+      "codigo_ejemplo": "\n```yaml\n# docker-compose.yml para microservicios\nversion: '3.8'\nservices:\n  api-gateway:\n    image: nginx:alpine\n    ports:\n      - \"80:80\"\n    depends_on:\n      - user-service\n      - order-service\n  \n  user-service:\n    image: user-service:latest\n    environment:\n      - DATABASE_URL=postgresql://user:pass@db:5432/users\n    depends_on:\n      - db\n  \n  order-service:\n    image: order-service:latest\n    environment:\n      - DATABASE_URL=postgresql://user:pass@db:5432/orders\n    depends_on:\n      - db\n  \n  db:\n    image: postgres:13\n    environment:\n      - POSTGRES_PASSWORD=pass\n    volumes:\n      - postgres_data:/var/lib/postgresql/data\n\nvolumes:\n  postgres_data:\n```",
+      "mejores_practicas": [
+        "Usar circuit breakers para resiliencia",
+        "Implementar health checks",
+        "Configurar auto-scaling",
+        "Usar distributed tracing"
+      ]
+    },
+    "serverless": {
+      "descripcion": "Arquitectura serverless con Azure Functions",
+      "componentes": [
+        "Azure Functions",
+        "Azure Logic Apps",
+        "Azure Event Grid",
+        "Azure Cosmos DB"
+      ],
+      "codigo_ejemplo": "\n```python\n# Azure Function con Durable Functions\nimport azure.functions as func\nimport azure.durable_functions as df\n\ndef orchestrator_function(context: df.DurableOrchestrationContext):\n    # Step 1: Procesar datos\n    result1 = yield context.call_activity('ProcessData', context.get_input())\n    \n    # Step 2: Validar datos\n    result2 = yield context.call_activity('ValidateData', result1)\n    \n    # Step 3: Guardar en base de datos\n    result3 = yield context.call_activity('SaveToDatabase', result2)\n    \n    return result3\n\ndef process_data(input_data):\n    # Lógica de procesamiento\n    return {\"processed\": True, \"data\": input_data}\n\ndef validate_data(data):\n    # Lógica de validación\n    if data.get(\"processed\"):\n        return {\"valid\": True, \"data\": data}\n    return {\"valid\": False, \"error\": \"Invalid data\"}\n\ndef save_to_database(data):\n    # Lógica de guardado\n    return {\"saved\": True, \"id\": \"12345\"}\n```",
+      "mejores_practicas": [
+        "Usar Durable Functions para workflows complejos",
+        "Implementar retry policies",
+        "Configurar monitoring y alerting",
+        "Optimizar cold start times"
+      ]
+    },
+    "event_driven": {
+      "descripcion": "Arquitectura orientada a eventos",
+      "componentes": [
+        "Azure Event Hubs",
+        "Azure Event Grid",
+        "Azure Service Bus",
+        "Azure Stream Analytics"
+      ],
+      "codigo_ejemplo": "\n```python\n# Event-driven architecture con Azure Event Hubs\nfrom azure.eventhub import EventHubProducerClient, EventData\nfrom azure.eventhub import EventHubConsumerClient\nimport asyncio\n\n# Producer\nasync def send_events():\n    producer = EventHubProducerClient.from_connection_string(\n        conn_str=\"your-connection-string\",\n        eventhub_name=\"your-eventhub\"\n    )\n    \n    async with producer:\n        event_data_batch = await producer.create_batch()\n        event_data_batch.add(EventData(\"Event 1\"))\n        event_data_batch.add(EventData(\"Event 2\"))\n        await producer.send_batch(event_data_batch)\n\n# Consumer\nasync def receive_events():\n    consumer = EventHubConsumerClient.from_connection_string(\n        conn_str=\"your-connection-string\",\n        consumer_group=\"$default\",\n        eventhub_name=\"your-eventhub\"\n    )\n    \n    async with consumer:\n        await consumer.receive(\n            on_event=on_event,\n            on_error=on_error,\n            on_partition_close=on_partition_close\n        )\n\ndef on_event(partition_context, event):\n    print(f\"Received event: {event.body_as_str()}\")\n    partition_context.update_checkpoint(event)\n\ndef on_error(partition_context, error):\n    print(f\"Error: {error}\")\n\ndef on_partition_close(partition_context, reason):\n    print(f\"Partition closed: {reason}\")\n```",
+      "mejores_practicas": [
+        "Usar event sourcing para auditoría",
+        "Implementar dead letter queues",
+        "Configurar event versioning",
+        "Monitorear throughput y latencia"
+      ]
+    }
+  },
+  "seguridad": {
+    "identity_management": {
+      "descripcion": "Gestión de identidades y acceso",
+      "practicas": [
+        "Usar Azure Active Directory (Azure AD) para autenticación centralizada",
+        "Implementar Multi-Factor Authentication (MFA)",
+        "Usar Managed Identities para servicios",
+        "Configurar Conditional Access policies",
+        "Implementar Just-In-Time (JIT) access"
+      ],
+      "codigo_ejemplo": "\n```python\n# Usando Managed Identity\nfrom azure.identity import DefaultAzureCredential\nfrom azure.keyvault.secrets import SecretClient\n\n# Usar Managed Identity automáticamente\ncredential = DefaultAzureCredential()\n\n# Conectar a Key Vault\nvault_url = \"https://your-vault.vault.azure.net/\"\nclient = SecretClient(vault_url=vault_url, credential=credential)\n\n# Obtener secretos\nsecret = client.get_secret(\"database-password\")\nprint(f\"Secret: {secret.value}\")\n\n# Configurar Azure AD para aplicaciones\nfrom azure.identity import ClientSecretCredential\n\ntenant_id = \"your-tenant-id\"\nclient_id = \"your-client-id\"\nclient_secret = \"your-client-secret\"\n\ncredential = ClientSecretCredential(\n    tenant_id=tenant_id,\n    client_id=client_id,\n    client_secret=client_secret\n)\n```",
+      "implementacion": [
+        "Configurar Azure AD Connect para sincronización híbrida",
+        "Crear grupos de seguridad para acceso basado en roles",
+        "Implementar Privileged Identity Management (PIM)",
+        "Configurar audit logs para monitoreo"
+      ]
+    },
+    "network_security": {
+      "descripcion": "Seguridad de red en Azure",
+      "practicas": [
+        "Usar Azure Firewall para protección de red",
+        "Implementar Network Security Groups (NSGs)",
+        "Configurar Azure DDoS Protection",
+        "Usar Azure Private Link para conectividad privada",
+        "Implementar Azure Bastion para acceso seguro"
+      ],
+      "codigo_ejemplo": "\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Network/networkSecurityGroups\",\n      \"apiVersion\": \"2021-05-01\",\n      \"name\": \"web-nsg\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"securityRules\": [\n          {\n            \"name\": \"Allow-HTTP\",\n            \"properties\": {\n              \"priority\": 100,\n              \"protocol\": \"Tcp\",\n              \"access\": \"Allow\",\n              \"direction\": \"Inbound\",\n              \"sourceAddressPrefix\": \"Internet\",\n              \"sourcePortRange\": \"*\",\n              \"destinationAddressPrefix\": \"*\",\n              \"destinationPortRange\": \"80\"\n            }\n          },\n          {\n            \"name\": \"Allow-HTTPS\",\n            \"properties\": {\n              \"priority\": 110,\n              \"protocol\": \"Tcp\",\n              \"access\": \"Allow\",\n              \"direction\": \"Inbound\",\n              \"sourceAddressPrefix\": \"Internet\",\n              \"sourcePortRange\": \"*\",\n              \"destinationAddressPrefix\": \"*\",\n              \"destinationPortRange\": \"443\"\n            }\n          },\n          {\n            \"name\": \"Deny-All\",\n            \"properties\": {\n              \"priority\": 4096,\n              \"protocol\": \"*\",\n              \"access\": \"Deny\",\n              \"direction\": \"Inbound\",\n              \"sourceAddressPrefix\": \"*\",\n              \"sourcePortRange\": \"*\",\n              \"destinationAddressPrefix\": \"*\",\n              \"destinationPortRange\": \"*\"\n            }\n          }\n        ]\n      }\n    }\n  ]\n}\n```",
+      "implementacion": [
+        "Configurar reglas NSG específicas por aplicación",
+        "Implementar Azure Firewall con reglas de aplicación",
+        "Configurar Azure DDoS Protection Standard",
+        "Usar Azure Private Link para servicios PaaS"
+      ]
+    }
+  },
+  "monitoreo": {
+    "application_insights": {
+      "descripcion": "Monitoreo de aplicaciones con Application Insights",
+      "practicas": [
+        "Configurar Application Insights para todas las aplicaciones",
+        "Implementar custom telemetry",
+        "Configurar alertas proactivas",
+        "Usar Live Metrics para monitoreo en tiempo real",
+        "Implementar distributed tracing"
+      ],
+      "codigo_ejemplo": "\n```python\n# Application Insights con Python\nfrom opencensus.ext.azure.log_exporter import AzureLogHandler\nfrom opencensus.ext.azure.trace_exporter import AzureExporter\nfrom opencensus.trace.tracer import Tracer\nfrom opencensus.trace.samplers import ProbabilitySampler\nimport logging\n\n# Configurar logging\nlogger = logging.getLogger(__name__)\nlogger.addHandler(AzureLogHandler(\n    connection_string='InstrumentationKey=your-key;IngestionEndpoint=https://your-endpoint'\n))\n\n# Configurar tracing\ntracer = Tracer(\n    exporter=AzureExporter(\n        connection_string='InstrumentationKey=your-key;IngestionEndpoint=https://your-endpoint'\n    ),\n    sampler=ProbabilitySampler(1.0)\n)\n\n# Ejemplo de uso\ndef process_order(order_id):\n    with tracer.span(name=\"process_order\"):\n        logger.info(f\"Processing order: {order_id}\")\n        \n        # Simular procesamiento\n        with tracer.span(name=\"validate_order\"):\n            logger.info(\"Validating order\")\n            # Lógica de validación\n        \n        with tracer.span(name=\"save_order\"):\n            logger.info(\"Saving order to database\")\n            # Lógica de guardado\n        \n        logger.info(f\"Order {order_id} processed successfully\")\n\n# Métricas personalizadas\nfrom opencensus.ext.azure import metrics_exporter\nfrom opencensus.stats import aggregation as aggregation_module\nfrom opencensus.stats import measure as measure_module\nfrom opencensus.stats import stats as stats_module\n\n# Crear métrica personalizada\nm_orders_processed = measure_module.MeasureFloat(\n    \"orders_processed\",\n    \"Number of orders processed\",\n    \"orders\"\n)\n\n# Configurar agregación\norders_aggregator = aggregation_module.CountAggregation()\norders_view = stats_module.new_view(\n    \"orders_processed\",\n    m_orders_processed,\n    aggregation=orders_aggregator\n)\n\n# Registrar vista\nstats_module.view_manager.register_view(orders_view)\n\n# Registrar métrica\nstats_module.stats_recorder.new_measurement_map().record(\n    {m_orders_processed: 1}\n)\n```",
+      "implementacion": [
+        "Configurar Application Insights en Azure Portal",
+        "Implementar custom telemetry en aplicaciones",
+        "Configurar alertas basadas en métricas",
+        "Usar Log Analytics para queries avanzadas"
+      ]
+    },
+    "log_analytics": {
+      "descripcion": "Análisis de logs con Log Analytics",
+      "practicas": [
+        "Centralizar logs de todas las aplicaciones",
+        "Crear queries KQL optimizadas",
+        "Configurar alertas basadas en logs",
+        "Implementar log retention policies",
+        "Usar workbooks para visualización"
+      ],
+      "codigo_ejemplo": "\n```kql\n// Query KQL para análisis de errores\nAppTraces\n| where TimeGenerated > ago(1h)\n| where SeverityLevel == 3\n| summarize ErrorCount = count() by bin(TimeGenerated, 5m), OperationName\n| render timechart\n\n// Query para análisis de performance\nAppRequests\n| where TimeGenerated > ago(24h)\n| summarize \n    AvgDuration = avg(Duration),\n    P95Duration = percentile(Duration, 95),\n    RequestCount = count()\n    by bin(TimeGenerated, 1h), Name\n| render timechart\n\n// Query para detección de anomalías\nAppRequests\n| where TimeGenerated > ago(7d)\n| summarize \n    AvgDuration = avg(Duration),\n    StdDev = stdev(Duration)\n    by Name\n| where AvgDuration > 1000\n| order by AvgDuration desc\n\n// Query para análisis de usuarios\nAppPageViews\n| where TimeGenerated > ago(1d)\n| summarize \n    UserCount = dcount(UserId),\n    PageViewCount = count()\n    by PageName\n| order by PageViewCount desc\n```",
+      "implementacion": [
+        "Configurar Log Analytics workspace",
+        "Conectar fuentes de datos (VMs, AKS, etc.)",
+        "Crear dashboards personalizados",
+        "Configurar alertas automáticas"
+      ]
+    }
+  },
+  "optimizacion_costos": {
+    "resource_optimization": {
+      "descripcion": "Optimización de recursos de Azure",
+      "practicas": [
+        "Usar Azure Reserved Instances para cargas de trabajo predecibles",
+        "Implementar Azure Hybrid Benefit",
+        "Configurar auto-shutdown para VMs de desarrollo",
+        "Usar Azure Spot Instances para cargas flexibles",
+        "Optimizar tamaños de VM según uso real"
+      ],
+      "codigo_ejemplo": "\n```python\n# Script para optimizar costos de VMs\nfrom azure.mgmt.compute import ComputeManagementClient\nfrom azure.mgmt.monitor import MonitorManagementClient\nfrom azure.identity import DefaultAzureCredential\nimport datetime\n\ndef analyze_vm_usage():\n    credential = DefaultAzureCredential()\n    subscription_id = \"your-subscription-id\"\n    \n    compute_client = ComputeManagementClient(credential, subscription_id)\n    monitor_client = MonitorManagementClient(credential, subscription_id)\n    \n    # Obtener todas las VMs\n    vms = compute_client.virtual_machines.list_all()\n    \n    for vm in vms:\n        # Obtener métricas de CPU de los últimos 7 días\n        end_time = datetime.datetime.utcnow()\n        start_time = end_time - datetime.timedelta(days=7)\n        \n        metrics = monitor_client.metrics.list(\n            vm.id,\n            timespan=f\"{start_time.isoformat()}/{end_time.isoformat()}\",\n            interval='PT1H',\n            metricnames='Percentage CPU',\n            aggregation='Average'\n        )\n        \n        # Analizar uso promedio\n        if metrics.value:\n            avg_cpu = sum(point.average for point in metrics.value[0].timeseries[0].data if point.average) / len([point.average for point in metrics.value[0].timeseries[0].data if point.average])\n            \n            print(f\"VM: {vm.name}\")\n            print(f\"  Size: {vm.hardware_profile.vm_size}\")\n            print(f\"  Avg CPU: {avg_cpu:.2f}%\")\n            \n            # Recomendaciones\n            if avg_cpu < 20:\n                print(f\"  Recommendation: Consider downsizing to smaller VM\")\n            elif avg_cpu > 80:\n                print(f\"  Recommendation: Consider upsizing to larger VM\")\n\n# Script para configurar auto-shutdown\ndef configure_auto_shutdown(vm_name, resource_group, shutdown_time=\"18:00\"):\n    from azure.mgmt.devtestlabs import DevTestLabsClient\n    \n    devtest_client = DevTestLabsClient(credential, subscription_id)\n    \n    # Configurar auto-shutdown\n    schedule = {\n        \"properties\": {\n            \"timeZoneId\": \"UTC\",\n            \"dailyRecurrence\": {\n                \"time\": shutdown_time\n            },\n            \"targetResourceId\": f\"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vm_name}\"\n        }\n    }\n    \n    devtest_client.schedules.create_or_update(\n        resource_group,\n        \"lab-name\",\n        f\"{vm_name}-shutdown\",\n        schedule\n    )\n```",
+      "implementacion": [
+        "Configurar Azure Cost Management",
+        "Implementar budgets y alertas de costo",
+        "Usar Azure Advisor para recomendaciones",
+        "Configurar auto-shutdown para recursos de desarrollo"
+      ]
+    },
+    "storage_optimization": {
+      "descripcion": "Optimización de almacenamiento",
+      "practicas": [
+        "Usar Azure Storage Lifecycle Management",
+        "Implementar Azure Blob Storage tiers",
+        "Configurar Azure File Sync para archivos",
+        "Usar Azure Backup para respaldos",
+        "Optimizar transferencias de datos"
+      ],
+      "codigo_ejemplo": "\n```python\n# Configurar lifecycle management para Storage\nfrom azure.storage.blob import BlobServiceClient\nfrom azure.storage.blob import BlobClient\nimport os\n\ndef configure_lifecycle_management():\n    connection_string = os.getenv('AZURE_STORAGE_CONNECTION_STRING')\n    blob_service_client = BlobServiceClient.from_connection_string(connection_string)\n    \n    # Configurar reglas de lifecycle\n    lifecycle_rules = [\n        {\n            \"id\": \"move-to-cool\",\n            \"enabled\": True,\n            \"filters\": {\n                \"blob_types\": [\"blockBlob\"],\n                \"prefix_match\": [\"logs/\"]\n            },\n            \"actions\": {\n                \"base_blob\": {\n                    \"tier_to_cool\": {\n                        \"days_after_modification_greater_than\": 30\n                    }\n                }\n            }\n        },\n        {\n            \"id\": \"move-to-archive\",\n            \"enabled\": True,\n            \"filters\": {\n                \"blob_types\": [\"blockBlob\"],\n                \"prefix_match\": [\"backups/\"]\n            },\n            \"actions\": {\n                \"base_blob\": {\n                    \"tier_to_archive\": {\n                        \"days_after_modification_greater_than\": 90\n                    }\n                }\n            }\n        },\n        {\n            \"id\": \"delete-old-backups\",\n            \"enabled\": True,\n            \"filters\": {\n                \"blob_types\": [\"blockBlob\"],\n                \"prefix_match\": [\"backups/\"]\n            },\n            \"actions\": {\n                \"base_blob\": {\n                    \"delete\": {\n                        \"days_after_modification_greater_than\": 365\n                    }\n                }\n            }\n        }\n    ]\n    \n    # Aplicar reglas\n    blob_service_client.set_service_properties(\n        lifecycle_rules=lifecycle_rules\n    )\n\n# Optimizar transferencias de datos\ndef optimize_data_transfer():\n    from azure.storage.blob import BlobServiceClient\n    from azure.storage.blob import BlobClient\n    import asyncio\n    import aiohttp\n    \n    async def upload_blob_async(blob_client, data):\n        async with aiohttp.ClientSession() as session:\n            await blob_client.upload_blob(data, overwrite=True)\n    \n    # Upload paralelo de múltiples blobs\n    async def upload_multiple_blobs():\n        tasks = []\n        for i in range(10):\n            blob_client = container_client.get_blob_client(f\"file-{i}.txt\")\n            data = f\"Content of file {i}\".encode()\n            task = upload_blob_async(blob_client, data)\n            tasks.append(task)\n        \n        await asyncio.gather(*tasks)\n```",
+      "implementacion": [
+        "Configurar Storage Lifecycle Management",
+        "Implementar Azure File Sync",
+        "Configurar Azure Backup",
+        "Optimizar transferencias con AzCopy"
+      ]
+    }
+  },
+  "checklist_implementacion": {
+    "seguridad": [
+      "✅ Configurar Azure AD con MFA",
+      "✅ Implementar Network Security Groups",
+      "✅ Configurar Azure Key Vault",
+      "✅ Habilitar Azure Security Center",
+      "✅ Configurar audit logs"
+    ],
+    "monitoreo": [
+      "✅ Configurar Application Insights",
+      "✅ Implementar Log Analytics",
+      "✅ Configurar alertas proactivas",
+      "✅ Crear dashboards personalizados",
+      "✅ Configurar distributed tracing"
+    ],
+    "costos": [
+      "✅ Configurar Azure Cost Management",
+      "✅ Implementar budgets y alertas",
+      "✅ Usar Reserved Instances",
+      "✅ Configurar auto-shutdown",
+      "✅ Optimizar tamaños de recursos"
+    ],
+    "resiliencia": [
+      "✅ Implementar Availability Zones",
+      "✅ Configurar backup automático",
+      "✅ Usar circuit breakers",
+      "✅ Implementar retry policies",
+      "✅ Configurar disaster recovery"
+    ]
+  }
+}
