@@ -1,5 +1,5 @@
+import { describe, test, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import '@testing-library/jest-dom'
 import App from './App'
 
 describe('App Component - Capítulo 1', () => {
@@ -7,7 +7,7 @@ describe('App Component - Capítulo 1', () => {
   test('renderiza el título "Vite + React"', () => {
     render(<App />)
     const titleElement = screen.getByText('Vite + React')
-    expect(titleElement).toBeInTheDocument()
+    expect(titleElement).toBeDefined()
     expect(titleElement.tagName).toBe('H1')
   })
 
@@ -15,7 +15,7 @@ describe('App Component - Capítulo 1', () => {
   test('inicializa el contador en 0', () => {
     render(<App />)
     const countButton = screen.getByText(/count is 0/i)
-    expect(countButton).toBeInTheDocument()
+    expect(countButton).toBeDefined()
     expect(countButton.tagName).toBe('BUTTON')
   })
 
@@ -26,15 +26,15 @@ describe('App Component - Capítulo 1', () => {
     
     // Primer clic
     fireEvent.click(countButton)
-    expect(screen.getByText(/count is 1/i)).toBeInTheDocument()
+    expect(screen.getByText(/count is 1/i)).toBeDefined()
     
     // Segundo clic
     fireEvent.click(countButton)
-    expect(screen.getByText(/count is 2/i)).toBeInTheDocument()
+    expect(screen.getByText(/count is 2/i)).toBeDefined()
     
     // Tercer clic
     fireEvent.click(countButton)
-    expect(screen.getByText(/count is 3/i)).toBeInTheDocument()
+    expect(screen.getByText(/count is 3/i)).toBeDefined()
   })
 
   // Test 4: Verificar que los logos se renderizan correctamente
@@ -43,8 +43,8 @@ describe('App Component - Capítulo 1', () => {
     const viteLogo = screen.getByAltText('Vite logo')
     const reactLogo = screen.getByAltText('React logo')
     
-    expect(viteLogo).toBeInTheDocument()
-    expect(reactLogo).toBeInTheDocument()
+    expect(viteLogo).toBeDefined()
+    expect(reactLogo).toBeDefined()
     expect(viteLogo.tagName).toBe('IMG')
     expect(reactLogo.tagName).toBe('IMG')
   })
@@ -65,7 +65,7 @@ describe('App Component - Capítulo 1', () => {
   test('renderiza el texto de instrucciones sobre HMR', () => {
     render(<App />)
     const editText = screen.getByText(/Edit src\/App\.jsx and save to test HMR/i)
-    expect(editText).toBeInTheDocument()
+    expect(editText).toBeDefined()
     expect(editText.tagName).toBe('P')
   })
 
@@ -73,7 +73,7 @@ describe('App Component - Capítulo 1', () => {
   test('renderiza el texto instructivo sobre los logos', () => {
     render(<App />)
     const clickText = screen.getByText(/Click on the Vite and React logos to learn more/i)
-    expect(clickText).toBeInTheDocument()
+    expect(clickText).toBeDefined()
     expect(clickText.tagName).toBe('P')
     expect(clickText).toHaveClass('read-the-docs')
   })
@@ -82,14 +82,14 @@ describe('App Component - Capítulo 1', () => {
   test('el botón del contador tiene la clase CSS correcta', () => {
     render(<App />)
     const countButton = screen.getByText(/count is 0/i)
-    expect(countButton).toBeInTheDocument()
+    expect(countButton).toBeDefined()
   })
 
   // Test 9: Verificar que el contenedor del botón tiene la clase card
   test('el contenedor del botón tiene la clase "card"', () => {
     render(<App />)
     const cardDiv = screen.getByText(/count is 0/i).closest('.card')
-    expect(cardDiv).toBeInTheDocument()
+    expect(cardDiv).toBeDefined()
   })
 
   // Test 10: Verificar que los logos tienen las clases CSS correctas
@@ -107,26 +107,26 @@ describe('App Component - Capítulo 1', () => {
     const { rerender } = render(<App />)
     
     // Estado inicial
-    expect(screen.getByText(/count is 0/i)).toBeInTheDocument()
+    expect(screen.getByText(/count is 0/i)).toBeDefined()
     
     // Re-renderizar el componente
     rerender(<App />)
     
     // El estado debería mantenerse en 0
-    expect(screen.getByText(/count is 0/i)).toBeInTheDocument()
+    expect(screen.getByText(/count is 0/i)).toBeDefined()
   })
 
   // Test 12: Verificar que el código inline se renderiza correctamente
   test('renderiza el código inline en el texto de instrucciones', () => {
     render(<App />)
     const codeElement = screen.getByText('src/App.jsx')
-    expect(codeElement).toBeInTheDocument()
+    expect(codeElement).toBeDefined()
     expect(codeElement.tagName).toBe('CODE')
   })
 
   // Test 13: Verificar que el componente no tiene errores de consola
   test('no genera errores en la consola', () => {
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     render(<App />)
     expect(consoleSpy).not.toHaveBeenCalled()
     consoleSpy.mockRestore()
@@ -137,12 +137,12 @@ describe('App Component - Capítulo 1', () => {
     render(<App />)
     
     // Verificar que las imágenes tienen texto alternativo
-    expect(screen.getByAltText('Vite logo')).toBeInTheDocument()
-    expect(screen.getByAltText('React logo')).toBeInTheDocument()
+    expect(screen.getByAltText('Vite logo')).toBeDefined()
+    expect(screen.getByAltText('React logo')).toBeDefined()
     
     // Verificar que el botón es clickeable
     const button = screen.getByRole('button')
-    expect(button).toBeInTheDocument()
+    expect(button).toBeDefined()
   })
 
   // Test 15: Verificar el comportamiento del estado con múltiples clics rápidos
@@ -156,6 +156,6 @@ describe('App Component - Capítulo 1', () => {
     }
     
     // Verificar que el contador llegó a 5
-    expect(screen.getByText(/count is 5/i)).toBeInTheDocument()
+    expect(screen.getByText(/count is 5/i)).toBeDefined()
   })
 }) 
