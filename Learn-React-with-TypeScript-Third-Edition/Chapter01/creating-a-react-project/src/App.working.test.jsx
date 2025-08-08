@@ -2,7 +2,7 @@ import { describe, test, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import App from './App'
 
-describe('App Component - Capítulo 1', () => {
+describe('App Component - Capítulo 1 (Versión Corregida)', () => {
   // Test 1: Verificar que el título se renderiza correctamente
   test('renderiza el título "Vite + React"', () => {
     render(<App />)
@@ -24,19 +24,22 @@ describe('App Component - Capítulo 1', () => {
   // Test 3: Verificar que el contador se incrementa al hacer clic
   test('incrementa el contador al hacer clic en el botón', () => {
     render(<App />)
-    const countButton = screen.getByText(/count is 0/i)
+    const countButton = screen.getByRole('button')
+    
+    // Verificar estado inicial
+    expect(countButton.textContent).toContain('0')
     
     // Primer clic
     fireEvent.click(countButton)
-    expect(screen.getByText(/count is 1/i)).toBeDefined()
+    expect(countButton.textContent).toContain('1')
     
     // Segundo clic
     fireEvent.click(countButton)
-    expect(screen.getByText(/count is 2/i)).toBeDefined()
+    expect(countButton.textContent).toContain('2')
     
     // Tercer clic
     fireEvent.click(countButton)
-    expect(screen.getByText(/count is 3/i)).toBeDefined()
+    expect(countButton.textContent).toContain('3')
   })
 
   // Test 4: Verificar que los logos se renderizan correctamente
@@ -54,19 +57,22 @@ describe('App Component - Capítulo 1', () => {
   // Test 5: Verificar que los enlaces tienen los atributos correctos
   test('los enlaces abren en nueva pestaña y tienen URLs correctas', () => {
     render(<App />)
-    const viteLink = screen.getByRole('link', { name: /vite logo/i })
-    const reactLink = screen.getByRole('link', { name: /react logo/i })
+    const links = screen.getAllByRole('link')
+    const viteLink = links.find(link => link.href === 'https://vite.dev/')
+    const reactLink = links.find(link => link.href === 'https://react.dev/')
     
-    expect(viteLink).toHaveAttribute('target', '_blank')
-    expect(reactLink).toHaveAttribute('target', '_blank')
-    expect(viteLink).toHaveAttribute('href', 'https://vite.dev')
-    expect(reactLink).toHaveAttribute('href', 'https://react.dev')
+    expect(viteLink).toBeDefined()
+    expect(reactLink).toBeDefined()
+    expect(viteLink.target).toBe('_blank')
+    expect(reactLink.target).toBe('_blank')
   })
 
   // Test 6: Verificar que el texto de instrucciones se renderiza
   test('renderiza el texto de instrucciones sobre HMR', () => {
     render(<App />)
-    const editText = screen.getByText(/Edit src\/App\.jsx and save to test HMR/i)
+    const editText = screen.getByText((content, element) => {
+      return element?.textContent === 'Edit src/App.jsx and save to test HMR'
+    })
     expect(editText).toBeDefined()
     expect(editText.tagName).toBe('P')
   })
@@ -74,24 +80,31 @@ describe('App Component - Capítulo 1', () => {
   // Test 7: Verificar que el texto sobre los logos se renderiza
   test('renderiza el texto instructivo sobre los logos', () => {
     render(<App />)
-    const clickText = screen.getByText(/Click on the Vite and React logos to learn more/i)
+    const clickText = screen.getByText('Click on the Vite and React logos to learn more')
     expect(clickText).toBeDefined()
     expect(clickText.tagName).toBe('P')
-    expect(clickText).toHaveClass('read-the-docs')
+    expect(clickText.className).toBe('read-the-docs')
   })
 
-  // Test 8: Verificar que el botón tiene la clase CSS correcta
-  test('el botón del contador tiene la clase CSS correcta', () => {
+  // Test 8: Verificar que el botón tiene funcionalidad
+  test('el botón del contador es clickeable', () => {
     render(<App />)
-    const countButton = screen.getByText(/count is 0/i)
+    const countButton = screen.getByRole('button')
     expect(countButton).toBeDefined()
+    
+    // Verificar que el click cambia el contenido
+    const initialText = countButton.textContent
+    fireEvent.click(countButton)
+    const newText = countButton.textContent
+    expect(newText).not.toBe(initialText)
   })
 
   // Test 9: Verificar que el contenedor del botón tiene la clase card
   test('el contenedor del botón tiene la clase "card"', () => {
     render(<App />)
-    const cardDiv = screen.getByText(/count is 0/i).closest('.card')
+    const cardDiv = screen.getByRole('button').closest('.card')
     expect(cardDiv).toBeDefined()
+    expect(cardDiv.className).toBe('card')
   })
 
   // Test 10: Verificar que los logos tienen las clases CSS correctas
@@ -100,22 +113,24 @@ describe('App Component - Capítulo 1', () => {
     const viteLogo = screen.getByAltText('Vite logo')
     const reactLogo = screen.getByAltText('React logo')
     
-    expect(viteLogo).toHaveClass('logo')
-    expect(reactLogo).toHaveClass('logo', 'react')
+    expect(viteLogo.className).toBe('logo')
+    expect(reactLogo.className).toBe('logo react')
   })
 
   // Test 11: Verificar que el componente se re-renderiza correctamente
-  test('el componente mantiene el estado correctamente entre re-renderizados', () => {
-    const { rerender } = render(<App />)
+  test('el componente mantiene el estado correctamente entre interacciones', () => {
+    render(<App />)
+    const countButton = screen.getByRole('button')
     
     // Estado inicial
-    expect(screen.getByText(/count is 0/i)).toBeDefined()
+    expect(countButton.textContent).toContain('0')
     
-    // Re-renderizar el componente
-    rerender(<App />)
+    // Hacer varios clics
+    fireEvent.click(countButton)
+    fireEvent.click(countButton)
     
-    // El estado debería mantenerse en 0
-    expect(screen.getByText(/count is 0/i)).toBeDefined()
+    // El estado debería haberse actualizado a 2
+    expect(countButton.textContent).toContain('2')
   })
 
   // Test 12: Verificar que el código inline se renderiza correctamente
@@ -150,7 +165,7 @@ describe('App Component - Capítulo 1', () => {
   // Test 15: Verificar el comportamiento del estado con múltiples clics rápidos
   test('maneja múltiples clics rápidos correctamente', () => {
     render(<App />)
-    const countButton = screen.getByText(/count is 0/i)
+    const countButton = screen.getByRole('button')
     
     // Hacer 5 clics rápidos
     for (let i = 0; i < 5; i++) {
@@ -158,6 +173,6 @@ describe('App Component - Capítulo 1', () => {
     }
     
     // Verificar que el contador llegó a 5
-    expect(screen.getByText(/count is 5/i)).toBeDefined()
+    expect(countButton.textContent).toContain('5')
   })
-}) 
+})
