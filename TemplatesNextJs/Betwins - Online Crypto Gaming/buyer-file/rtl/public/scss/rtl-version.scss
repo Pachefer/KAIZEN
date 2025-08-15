@@ -1,0 +1,274 @@
+/* ==== 
+ --------- rtl version styles start ---------
+ ==== */
+// mixins
+@use "./abstracts/mixins" as *;
+// variables
+@use "./abstracts/variables" as *;
+
+.rtl {
+  direction: rtl;
+
+  .color-palate-inner {
+    direction: ltr !important;
+  }
+
+  .title-animation {
+    direction: ltr;
+    text-align: end;
+  }
+
+  .swiper {
+    direction: ltr;
+  }
+
+  .slider-navigation {
+    direction: ltr;
+  }
+
+  .progress-wrap {
+    span {
+      transform: translate(50%, -50%);
+
+      &::before {
+        transform: translate(50%, -50%);
+      }
+
+      &::after {
+        transform: translate(50%, 200%);
+      }
+    }
+  }
+
+  .header,
+  .mobile-menu,
+  .mobile-menu__backdrop,
+  .counter__singl,
+  .work__cta p {
+    direction: ltr;
+  }
+
+  .banner .thumb img,
+  .banner-three .banner-thumb img,
+  .common-banner img {
+    scale: -1 1;
+  }
+
+  .common-banner .thumb-wrapper {
+    inset-inline-end: 0px;
+  }
+
+  .breadcrumb {
+    direction: ltr;
+    justify-content: flex-end;
+  }
+
+  .rtl-header {
+    direction: ltr;
+
+    .title-animation {
+      text-align: start;
+    }
+  }
+
+  .result__single {
+    direction: rtl;
+  }
+
+  .section__header {
+    .title-animation {
+      text-align: center;
+    }
+  }
+
+
+
+  .work__single .thumb .lg-arrow {
+    right: unset;
+    left: -140px;
+    scale: -1 1;
+  }
+
+    .work-alter .thumb .lg-arrow {
+    right: unset;
+    left: -255px !important;
+    scale: -1 1;
+  }
+
+  .footer__newsletter {
+    direction: ltr;
+
+    .title-animation {
+      text-align: start;
+    }
+  }
+
+  .footer__newsletter-two {
+    .title-animation {
+      text-align: center;
+    }
+  }
+
+  @media (min-width: 992px) {
+    .text-lg-start {
+      text-align: start !important;
+    }
+  }
+
+  .testimonial__content {
+    .title-animation {
+      text-align: start;
+    }
+  }
+
+  .testimonial-alt {
+    .testimonial__thumb {
+      direction: rtl;
+
+      .left-thumb {
+        direction: rtl;
+      }
+
+      .bottom-left-thumb {
+        direction: rtl;
+      }
+    }
+  }
+
+  .work-two .ar-img {
+    scale: -1 1;
+    right: 74%;
+    left: unset;
+  }
+
+  .hero .hero__thumb-wrapper {
+    direction: rtl;
+
+    img {
+      scale: -1 1;
+    }
+  }
+
+  .lottery-alternate {
+    .section__content {
+      .title-animation {
+        text-align: center !important;
+      }
+    }
+  }
+
+  .lottery-alternate {
+    .section__content {
+      .title-animation.lcr {
+        text-align: start !important;
+      }
+    }
+  }
+
+  .common-banner {
+    .bg-r {
+      img {
+        scale: 1;
+      }
+    }
+  }
+
+  @media only screen and (min-width: 1400px) {
+    .work-two .ar-img {
+      right: 68%;
+      left: unset;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .offset-xl-1 {
+      margin-left: unset;
+      margin-inline-start: 8.33333333%;
+    }
+
+    .offset-xl-6 {
+      margin-left: unset;
+      margin-inline-start: 50%;
+    }
+  }
+
+  @media (min-width: 1400px) {
+    .offset-xxl-1 {
+      margin-left: unset;
+      margin-inline-start: 8.33333333%;
+    }
+  }
+
+  .counter__single h3 {
+    direction: ltr;
+  }
+
+  .text-start {
+    text-align: start !important;
+  }
+
+  @media (min-width: 1200px) {
+    .text-xl-end {
+      text-align: end !important;
+    }
+  }
+
+  .banner-two {
+    direction: ltr;
+
+    .title-animation {
+      text-align: center;
+    }
+  }
+
+  .about,
+  .choose {
+    direction: ltr;
+
+    .title-animation {
+      text-align: start;
+    }
+  }
+
+  .fantasy__single-alt .thumb {
+    inset-inline-end: -45px;
+
+    img {
+      max-width: 12vw;
+    }
+  }
+
+  .contest-group .ti-calendar-check {
+    padding-right: 0px;
+    padding-left: 16px;
+  }
+
+  .details__list li {
+    padding-inline-start: 20px;
+  }
+
+  .details__list li::before {
+    inset-inline-start: 0px;
+  }
+
+  .testimonial__content {
+    .text-start {
+      text-align: end !important;
+    }
+  }
+
+  .accordion-button::after {
+    margin-left: unset !important;
+    margin-inline-start: auto;
+  }
+
+  .error {
+    .title-animation {
+      text-align: center;
+    }
+  }
+}
+
+/* ==== 
+ --------- rtl version styles end ---------
+ ==== */
