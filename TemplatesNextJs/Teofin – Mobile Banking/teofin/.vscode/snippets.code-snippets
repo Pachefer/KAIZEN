@@ -1,0 +1,82 @@
+{
+  "customComponent": {
+    "prefix": "cc",
+    "body": [
+      "'use client';",
+      "",
+      "import React from 'react'",
+      "",
+      "export const ${TM_FILENAME_BASE}: React.FC = () => {",
+      "  return <div>${TM_FILENAME_BASE}</div>;",
+      "};"
+    ],
+    "description": "create custom component"
+  },
+  "renderHeader": {
+    "prefix": "rh",
+    "body": [
+      "const renderHeader = () => {",
+      "  return <components.Header />;",
+      "};"
+    ],
+    "description": "Рендерит шапку"
+  },
+  "renderContent": {
+    "prefix": "rc",
+    "body": [
+      "const renderContent = () => {",
+      "  return <main>Content</main>;",
+      "};"
+    ],
+    "description": "Рендерит контент"
+  },
+  "renderButton": {
+    "prefix": "rb",
+    "body": [
+      "const renderButton = () => {",
+      "  return <components.Button label='this is button' href={'#'} />;",
+      "};"
+    ],
+    "description": "Рендерит кнопку"
+  },
+  "ic": {
+    "prefix": "ic",
+    "body": [
+      "import {${1:components}} from '@/${1:components}';"
+    ],
+    "description": "Импортирует компонент"
+  },
+  "isvg": {
+    "prefix": "isvg",
+    "body": [
+      "import {${1:svg}} from '@/${1:assets/svg}';"
+    ],
+    "description": "Импортирует компонент"
+  },
+   "icn": {
+    "prefix": "icn",
+    "body": [
+      "import {${1:constants}} from '@/constants';"
+    ],
+    "description": "Импортирует компонент"
+  },
+  "ii": {
+    "prefix": "ii",
+    "body": [
+      "import {${1:items}} from '@/${1:items}';"
+    ],
+    "description": "Импортирует компонент"
+  },
+  "it": {
+    "prefix": "it",
+    "body": [
+      "import {${1:types}} from '@/${1:types}';"
+    ],
+    "description": "Imports types"
+  },
+  "ih": {
+    "prefix": "ih",
+    "body": ["import {hooks} from '@/hooks';"],
+    "description": "Импортирует компонент"
+  },
+}

@@ -1,0 +1,5 @@
+import {TransactionHistory} from './TransactionHistory';
+
+export default function TransactionHistoryPage() {
+  return <TransactionHistory />;
+}

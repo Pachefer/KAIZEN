@@ -1,0 +1,93 @@
+* {
+  box-sizing: border-box;
+  scrollbar-width: none;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  box-sizing: border-box;
+  font-family: 'Mulish', sans-serif;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  /* color: #7d849a; */
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  display: flex;
+  outline: 'none';
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+  opacity: 0.4;
+}
+
+.number-of-lines-1 {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style: none;
+}
+
+:root {
+  /* CSS переменные для безопасных областей с fallback */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+
+  --white-color: #fff;
+
+  --link-color: #ff5887;
+  --main-dark-color: #1b1d4d;
+  --body-text-color: #4c4c60;
+  --anti-flash-white: #edf0f2;
+
+  --header-height: 48px;
+  --bottom-tabbar-height: 70px;
+
+  --border-radius: 8px;
+  --screen-width: 600px;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
