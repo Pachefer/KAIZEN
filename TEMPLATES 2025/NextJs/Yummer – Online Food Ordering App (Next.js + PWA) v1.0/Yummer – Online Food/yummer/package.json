@@ -1,0 +1,32 @@
+{
+  "name": "yummer",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@ducanh2912/next-pwa": "^10.2.9",
+    "@reduxjs/toolkit": "^2.8.2",
+    "axios": "^1.11.0",
+    "motion": "^12.23.11",
+    "next": "15.4.4",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-redux": "^9.2.0",
+    "react-spinners": "^0.17.0",
+    "sass": "^1.89.2",
+    "swiper": "^11.2.10",
+    "zustand": "^5.0.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5",
+    "webpack": "^5.100.2"
+  }
+}
