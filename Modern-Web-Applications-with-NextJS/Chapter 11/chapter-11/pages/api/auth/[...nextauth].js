@@ -1,15 +1,26 @@
 import NextAuth from 'next-auth';
-import Providers from 'next-auth/providers';
+// import Providers from 'next-auth/providers';
+import CredentialsProvider from 'next-auth/providers/credentials';
+
+import GithubProvider from 'next-auth/providers/github';
+
+// import CredentialsProvider from 'next-auth/providers/credentials';
+
+// import { verifyPassword } from '../../../lib/auth';
+// import { connectToDatabase } from '../../../lib/db';
 
 import { verifyPassword } from '../../../lib/auth';
 import { connectToDatabase } from '../../../lib/db';
+
+
 
 export default NextAuth({
   session: {
     jwt: true,
   },
   providers: [
-    Providers.Credentials({
+    // Providers.Credentials({
+       CredentialsProvider({
       async authorize(credentials) {
         const client = await connectToDatabase();
 
