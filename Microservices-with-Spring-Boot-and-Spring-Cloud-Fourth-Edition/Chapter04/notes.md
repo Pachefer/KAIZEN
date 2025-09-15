@@ -182,3 +182,115 @@ chapter04-product             latest    9341b5237f20   50 minutes ago       341M
  ---------
  Podemos seguir el inicio monitoreando la salida que se escribe en el registro de cada contenedor. con el siguiente comando:
     docker compose logs -f
+---------
+
+pachefer@Pro-de-Fernando Chapter04 %    curl localhost:8080/product-composite/123 -s | jq .
+{
+  "productId": 123,
+  "name": "name-123",
+  "weight": 123,
+  "recommendations": [
+    {
+      "recommendationId": 1,
+      "author": "Author 1",
+      "rate": 1
+    },
+    {
+      "recommendationId": 2,
+      "author": "Author 2",
+      "rate": 2
+    },
+    {
+      "recommendationId": 3,
+      "author": "Author 3",
+      "rate": 3
+    }
+  ],
+  "reviews": [
+    {
+      "reviewId": 1,
+      "author": "Author 1",
+      "subject": "Subject 1"
+    },
+    {
+      "reviewId": 2,
+      "author": "Author 2",
+      "subject": "Subject 2"
+    },
+    {
+      "reviewId": 3,
+      "author": "Author 3",
+      "subject": "Subject 3"
+    }
+  ],
+  "serviceAddresses": {
+    "cmp": "ee0ebc6f87ef/172.18.0.2:8080",
+    "pro": "5be350234b4f/172.18.0.3:8080",
+    "rev": "1ad47ae0ea33/172.18.0.4:8080",
+    "rec": "fb484ff87239/172.18.0.5:8080"
+  }
+}
+Sin embargo, hay una gran diferencia: los nombres de host y los puertos informados por serviceAddresses en la respuesta:
+Aquí podemos ver los nombres de host y las direcciones IP que se han asignado a cada uno de los Docker contenedores.
+
+----------
+comando anterior cerrará el entorno de microservicios:
+ docker compose down
+ ---------
+ El script de prueba se puede encontrar en $BOOK_HOME/Chapter04/test­em­all.bash.
+ -------
+ Antes de ejecutar el conjunto de pruebas, el script de prueba comprobará la presencia de un argumento de inicio en la invocación del script. Si lo encuentra, reiniciará los contenedores con el siguiente código:
+
+  ./test-em-all.bash start stop
+
+  pachefer@Pro-de-Fernando Chapter04 %    ./test-em-all.bash start stop
+Start Tests: Mon Sep 15 02:14:37 CST 2025
+HOST=localhost
+PORT=8080
+Restarting the test environment...
+$ docker compose down --remove-orphans
+[+] Running 5/5
+ ✔ Container chapter04-product-composite-1  Removed                                                                                                       2.3s 
+ ✔ Container chapter04-recommendation-1     Removed                                                                                                       2.4s 
+ ✔ Container chapter04-product-1            Removed                                                                                                       2.4s 
+ ✔ Container chapter04-review-1             Removed                                                                                                       2.3s 
+ ✔ Network chapter04_default                Removed                                                                                                       0.1s 
+$ docker compose up -d
+[+] Building 0.0s (0/0)                                                                                                                   docker:desktop-linux
+[+] Running 5/5
+ ✔ Network chapter04_default                Created                                                                                                       0.1s 
+ ✔ Container chapter04-product-1            Started                                                                                                       0.1s 
+ ✔ Container chapter04-review-1             Started                                                                                                       0.1s 
+ ✔ Container chapter04-product-composite-1  Started                                                                                                       0.1s 
+ ✔ Container chapter04-recommendation-1     Started                                                                                                       0.1s 
+Wait for: curl http://localhost:8080/product-composite/1... , retry #1 , retry #2 , retry #3 DONE, continues...
+Test OK (HTTP Code: 200)
+Test OK (actual value: 1)
+Test OK (actual value: 3)
+Test OK (actual value: 3)
+Test OK (HTTP Code: 404, {"timestamp":"2025-09-15T08:14:51.597751983Z","path":"/product-composite/13","message":"No product found for productId: 13","status":404,"error":"Not Found"})
+Test OK (actual value: No product found for productId: 13)
+Test OK (HTTP Code: 200)
+Test OK (actual value: 113)
+Test OK (actual value: 0)
+Test OK (actual value: 3)
+Test OK (HTTP Code: 200)
+Test OK (actual value: 213)
+Test OK (actual value: 3)
+Test OK (actual value: 0)
+Test OK (HTTP Code: 422, {"timestamp":"2025-09-15T08:14:51.787744805Z","path":"/product-composite/-1","message":"Invalid productId: -1","status":422,"error":"Unprocessable Entity"})
+Test OK (actual value: "Invalid productId: -1")
+Test OK (HTTP Code: 400, {"timestamp":"2025-09-15T08:14:51.833+00:00","path":"/product-composite/invalidProductId","status":400,"error":"Bad Request","requestId":"1c60c2f9-7","message":"Type mismatch."})
+Test OK (actual value: "Type mismatch.")
+We are done, stopping the test environment...
+$ docker compose down
+[+] Running 5/5
+ ✔ Container chapter04-recommendation-1     Removed                                                                                                       2.4s 
+ ✔ Container chapter04-product-composite-1  Removed                                                                                                       2.3s 
+ ✔ Container chapter04-review-1             Removed                                                                                                       2.3s 
+ ✔ Container chapter04-product-1            Removed                                                                                                       2.4s 
+ ✔ Network chapter04_default                Removed                                                                                                       0.1s 
+End, all tests OK: Mon Sep 15 02:14:54 CST 2025
+---------
+Toma imágenes de Docker de la fuente y luego ejecuta todas las pruebas en Docker:
+ ./gradlew clean build && docker compose build && ./test-em-all.bash start stop
