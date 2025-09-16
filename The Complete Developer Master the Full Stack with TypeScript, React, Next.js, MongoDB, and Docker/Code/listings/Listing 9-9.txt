@@ -1,0 +1,5 @@
+const payloadObject = {
+    "exp": 234133423,
+    "weather_public_zip": "96815",
+    "weather_private_type": "GitHub"
+}

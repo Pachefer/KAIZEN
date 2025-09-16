@@ -1,0 +1,65 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Sample Next.js - OpenAPI 3.x",
+        "description": "The example APIs from our Next.js application",
+        "version": "1.0.0"
+    },
+    "servers": [
+        { "url": "https://www.usemodernfullstack.dev/api/" },
+        { "url": "http://localhost:3000/api/" }
+    ],
+    "paths": {
+        "/v1/weather/{zipcode}": {
+            "get": {
+                "summary": "Get weather by zip code",
+                "parameters": [
+                    {
+                        "name": "zipcode",
+                        "in": "path",
+                        "description": "The zip code for the location as string.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": 96815
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/weatherDetailType"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "weatherDetailType": {
+                "type": "object",
+                "properties": {
+                    "zipcode": {
+                        "type": "string",
+                        "example": 96815
+                    },
+                    "weather": {
+                        "type": "string",
+                        "example": "sunny"
+                    },
+                    "temp": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 35
+                    }
+                }
+            }
+        }
+    }
+}

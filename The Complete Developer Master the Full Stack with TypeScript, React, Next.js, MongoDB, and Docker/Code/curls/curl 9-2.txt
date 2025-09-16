@@ -1,0 +1,11 @@
+curl -i \
+-X POST 'https://www.usemodernfullstack.dev/oauth/authenticate' \
+-H 'Accept: text/html' \
+-H 'Content-Type: application/x-www-form-urlencoded' \
+-d "response_type=code\
+&client_id=<OAUTH_CLIENT_ID>\
+&state=4nBjkh31\
+&scope=read\
+&redirect_uri=http://localhost:3000/oauth/callback\
+&username=<OAUTH_USER>\
+&password=<OAUTH_PASSWORD>"

@@ -1,0 +1,8 @@
+query GetWeatherWithFriends {
+    weather( zip: "96815") {
+        weather
+        friends {
+            weather
+        }
+    }
+}

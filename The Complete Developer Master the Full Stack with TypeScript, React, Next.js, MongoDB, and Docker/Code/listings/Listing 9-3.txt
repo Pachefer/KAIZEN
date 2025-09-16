@@ -1,0 +1,3 @@
+{
+    "sub": "THE_CLIENT_ID"
+}

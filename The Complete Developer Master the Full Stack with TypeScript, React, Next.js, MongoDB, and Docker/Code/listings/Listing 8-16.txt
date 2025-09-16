@@ -1,0 +1,3 @@
+const sum = (data: number[]): number => 999;
+
+export { sum };

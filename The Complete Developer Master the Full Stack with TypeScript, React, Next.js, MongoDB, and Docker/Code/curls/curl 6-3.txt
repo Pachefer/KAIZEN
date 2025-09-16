@@ -1,0 +1,7 @@
+curl -i \
+-X POST \
+-H "Accept: application/json" \
+-H "Authorization: Bearer 83dedad0728baaef3ad3f50bd05ed030" \
+-H "Content-Type: application/json" \
+-d '{"query":"\nquery Weather {\n weather( zip: \"96815\") {\n tempC \n }\n}" }' \
+https://www.usemodernfullstack.dev/api/graphql

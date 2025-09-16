@@ -1,0 +1,1 @@
+let weather: string = "sunny";

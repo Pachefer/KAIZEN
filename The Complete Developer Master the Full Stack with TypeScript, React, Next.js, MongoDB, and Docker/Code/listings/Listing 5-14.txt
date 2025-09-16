@@ -1,0 +1,1 @@
+return {        props: {        names,        revalidate: 30    }};

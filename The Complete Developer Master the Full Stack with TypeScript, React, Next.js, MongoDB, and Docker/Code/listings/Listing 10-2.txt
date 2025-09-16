@@ -1,0 +1,15 @@
+version: "3.0"
+services:
+  application:
+    image: nextjs:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/home/node/
+    command: "npm run dev"
+
+  jest:
+    image: nextjs:latest
+    volumes:
+      - ./:/home/node/
+    command: "npx jest ./__tests__/mongoose/weather/services.test.ts --watchAll"

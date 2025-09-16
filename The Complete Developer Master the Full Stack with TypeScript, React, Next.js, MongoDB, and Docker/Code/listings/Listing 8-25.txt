@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PageComponentWeather renders correctly 1`] = `
+<h1
+    data-testid="h1"
+    onClick={[Function]}
+>
+    The weather is
+    sunny
+    , and the counter shows
+    0
+</h1>
+`;

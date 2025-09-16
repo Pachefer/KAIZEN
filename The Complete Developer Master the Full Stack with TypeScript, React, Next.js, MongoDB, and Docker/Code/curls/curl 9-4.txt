@@ -1,0 +1,4 @@
+curl -i \
+-X GET 'https://www.usemodernfullstack.dev/protected/resource' \
+-H 'Accept: text/html' \
+-H 'Authorization: Bearer <ACCESS_TOKEN>'

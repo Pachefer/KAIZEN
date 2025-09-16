@@ -1,0 +1,1 @@
+curl -i \-X GET \-H "Accept: application/json" \-H "Authorization: Bearer 83dedad0728baaef3ad3f50bd05ed030" \https://www.usemodernfullstack.dev/api/v2/weather/96815

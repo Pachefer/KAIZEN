@@ -1,0 +1,3 @@
+curl -i \
+-X GET 'https://www.usemodernfullstack.dev/protected/resource' \
+-H 'Accept: text/html'
